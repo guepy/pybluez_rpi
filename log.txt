@@ -1,0 +1,289 @@
+Now connected to server 172.17.0.1 @ port 3355
+received buf 
+CLIENT: 172.17.0.1
+data received: CLIENT: 172.17.0.1
+ RFID_send_cmdd init
+ Process BLE send msgs init
+Starting TCP Chat client, Thread 3039953984
+[ECCEL_RFID_READER@172.17.0.1]Starting RFID_send_cmdd, Thread 3030381632
+Starting Process BLE send msgs, Thread 3019895872
+List of already known devices:
+---- Existing paths ---
+Path 1: /org/bluez/hci0/dev_70_E4_E6_5E_A3_88
+Address: 70:E4:E6:5E:A3:88
+-----------------------------------------------------
+Path 2: /org/bluez/hci0/dev_5C_80_B6_49_9A_CA
+Address: 5C:80:B6:49:9A:CA
+-----------------------------------------------------
+Path 3: /org/bluez/hci0/dev_51_5C_57_55_52_31
+Address: 51:5C:57:55:52:31
+-----------------------------------------------------
+Path 4: /org/bluez/hci0/dev_74_4C_A1_7A_3F_A0
+Address: 74:4C:A1:7A:3F:A0
+-----------------------------------------------------
+Path 5: /org/bluez/hci0/dev_18_01_F1_1D_F4_40
+Address: 18:01:F1:1D:F4:40
+-----------------------------------------------------
+Path 6: /org/bluez/hci0/dev_24_6F_28_1A_61_8A
+Address: 24:6F:28:1A:61:8A
+-----------------------------------------------------
+Scanning new one...
+-----------------------------------------------------
+Disconnecting from 70:E4:E6:5E:A3:88...
+Disconnection succeed
+-----------------------------------------------------
+Removing 70:E4:E6:5E:A3:88...
+Removing succeed
+-----------------------------------------------------
+Disconnecting from 5C:80:B6:49:9A:CA...
+Disconnection succeed
+-----------------------------------------------------
+Removing 5C:80:B6:49:9A:CA...
+Removing succeed
+-----------------------------------------------------
+Disconnecting from 51:5C:57:55:52:31...
+Disconnection succeed
+-----------------------------------------------------
+Removing 51:5C:57:55:52:31...
+Removing succeed
+-----------------------------------------------------
+Disconnecting from 74:4C:A1:7A:3F:A0...
+Disconnection succeed
+-----------------------------------------------------
+Removing 74:4C:A1:7A:3F:A0...
+Removing succeed
+-----------------------------------------------------
+Disconnecting from 18:01:F1:1D:F4:40...
+Disconnection succeed
+-----------------------------------------------------
+Removing 18:01:F1:1D:F4:40...
+Removing succeed
+-----------------------------------------------------
+Disconnecting from 24:6F:28:1A:61:8A...
+Disconnection succeed
+-----------------------------------------------------
+Removing 24:6F:28:1A:61:8A...
+Removing succeed
+Deleting device's address 70:E4:E6:5E:A3:88...
+-----------------------------------------------------------
+Interface added
+New device: /org/bluez/hci0/dev_70_E4_E6_5E_A3_88
+Device address: 70:E4:E6:5E:A3:88
+Device RSSI: -83
+-----------------------------------------------------------
+Deleting device's address 5C:80:B6:49:9A:CA...
+-----------------------------------------------------------
+Deleting device's address 51:5C:57:55:52:31...
+-----------------------------------------------------------
+Deleting device's address 74:4C:A1:7A:3F:A0...
+-----------------------------------------------------------
+Deleting device's address 18:01:F1:1D:F4:40...
+-----------------------------------------------------------
+Interface added
+New device: /org/bluez/hci0/dev_51_5C_57_55_52_31
+Device address: 51:5C:57:55:52:31
+Device RSSI: -77
+-----------------------------------------------------------
+Properties changed
+Path: /org/bluez/hci0/dev_24_6F_28_1A_61_8A
+Device Name: Pepper_C1-1A6188
+Device Address: 24:6F:28:1A:61:8A
+ServicesResolved: False
+-----------------------------------------------------------
+Properties changed
+Path: /org/bluez/hci0/dev_24_6F_28_1A_61_8A
+Device Name: Pepper_C1-1A6188
+Device Address: 24:6F:28:1A:61:8A
+-----------------------------------------------------------
+Deleting device's address 24:6F:28:1A:61:8A...
+-----------------------------------------------------------
+Interface added
+New device: /org/bluez/hci0/dev_24_6F_28_1A_61_8A
+Device Name: Pepper_C1-1A6188
+Device address: 24:6F:28:1A:61:8A
+ECCEL Reader added
+Device RSSI: -66
+-----------------------------------------------------------
+**********************************************************************
+List of known devices
+**********************************************************************
+1) Unknow name, Address: 70:E4:E6:5E:A3:88
+2) Unknow name, Address: 51:5C:57:55:52:31
+3) Name: Pepper_C1-1A6188, Address: 24:6F:28:1A:61:8A
+-----------------------------------------------------
+Connecting to 24:6F:28:1A:61:8A...
+Connection succeed
+received buf 
+{'name': 'ACK', 'topic': '', 'payload': ''}
+{'name': 'ACK', 'topic': '', 'payload': ''}
+[ECCEL_RFID_READER@172.17.0.1]Interface added
+New device: /org/bluez/hci0/dev_18_01_F1_1D_F4_40
+Device Name: Redmi
+Device address: 18:01:F1:1D:F4:40
+Device RSSI: -67
+-----------------------------------------------------------
+**********************************************************************
+List of known devices
+**********************************************************************
+1) Unknow name, Address: 70:E4:E6:5E:A3:88
+2) Unknow name, Address: 51:5C:57:55:52:31
+3) Name: Pepper_C1-1A6188, Address: 24:6F:28:1A:61:8A
+4) Name: Redmi, Address: 18:01:F1:1D:F4:40
+Device Pepper_C1-1A6188 is already connected
+Interface added
+New device: /org/bluez/hci0/dev_74_4C_A1_7A_3F_A0
+Device Name: DESKTOP-6ETM3VT
+Device address: 74:4C:A1:7A:3F:A0
+Device RSSI: -29
+-----------------------------------------------------------
+Interface added
+New device: /org/bluez/hci0/dev_5C_80_B6_49_9A_CA
+Device Name: ORD00148
+Device address: 5C:80:B6:49:9A:CA
+Device RSSI: -63
+-----------------------------------------------------------
+Properties changed
+Path: /org/bluez/hci0/dev_24_6F_28_1A_61_8A
+Device Name: Pepper_C1-1A6188
+Device Address: 24:6F:28:1A:61:8A
+Device RSSI: -66
+-----------------------------------------------------------
+Interface added
+Service Path: /org/bluez/hci0/dev_24_6F_28_1A_61_8A/service0001
+Service UUID: 00001801-0000-1000-8000-00805f9b34fb
+Service Name: Generic Attribute Service
+-----------------------------------------------------------
+Interface added
+Charractetitic Path: /org/bluez/hci0/dev_24_6F_28_1A_61_8A/service0001/char0002
+Charractetitic UUID: 00002a05-0000-1000-8000-00805f9b34fb
+Charractetitic Name: Service Changed
+Charractetitic Flags: indicate,
+-----------------------------------------------------------
+Interface added
+-----------------------------------------------------------
+Descriptor Path: /org/bluez/hci0/dev_24_6F_28_1A_61_8A/service0001/char0002/desc0004
+Descriptor UUID: 00002902-0000-1000-8000-00805f9b34fb
+Interface added
+Service Path: /org/bluez/hci0/dev_24_6F_28_1A_61_8A/service0028
+Service UUID: f03c26b1-3fb1-4d67-912e-4ae31159aef0
+Service Name: Unknown
+-----------------------------------------------------------
+Interface added
+Charractetitic Path: /org/bluez/hci0/dev_24_6F_28_1A_61_8A/service0028/char0029
+Charractetitic UUID: f03c26b2-3fb1-4d67-912e-4ae31159aef0
+Charractetitic Name: Unknown
+command send to ECCEL reader  F5 03 00 FC FF 02 B2 C1
+write to /org/bluez/hci0/dev_24_6F_28_1A_61_8A/service0028/char0029 suceeed
+Charractetitic Flags: read,write,notify,
+-----------------------------------------------------------
+Interface added
+-----------------------------------------------------------
+Descriptor Path: /org/bluez/hci0/dev_24_6F_28_1A_61_8A/service0028/char0029/desc002b
+Descriptor UUID: 00002902-0000-1000-8000-00805f9b34fb
+Interface added
+Charractetitic Path: /org/bluez/hci0/dev_24_6F_28_1A_61_8A/service0028/char002c
+Charractetitic UUID: f03c26b3-3fb1-4d67-912e-4ae31159aef0
+Charractetitic Name: Unknown
+successfully register to notifications on /org/bluez/hci0/dev_24_6F_28_1A_61_8A/service0028/char002c
+Charractetitic Flags: read,write,notify,
+-----------------------------------------------------------
+Interface added
+-----------------------------------------------------------
+Descriptor Path: /org/bluez/hci0/dev_24_6F_28_1A_61_8A/service0028/char002c/desc002e
+Descriptor UUID: 00002902-0000-1000-8000-00805f9b34fb
+Properties changed
+Path: /org/bluez/hci0/dev_24_6F_28_1A_61_8A
+Device Name: Pepper_C1-1A6188
+Device Address: 24:6F:28:1A:61:8A
+Device RSSI: -66
+ServicesResolved: True
+-----------------------------------------------------------
+Char notification received
+**********************************************************************
+List of known devices
+**********************************************************************
+1) Unknow name, Address: 70:E4:E6:5E:A3:88
+2) Unknow name, Address: 51:5C:57:55:52:31
+3) Name: Pepper_C1-1A6188, Address: 24:6F:28:1A:61:8A
+4) Name: Redmi, Address: 18:01:F1:1D:F4:40
+5) Name: DESKTOP-6ETM3VT, Address: 74:4C:A1:7A:3F:A0
+6) Name: ORD00148, Address: 5C:80:B6:49:9A:CA
+Device Pepper_C1-1A6188 is already connected
+Interface added
+New device: /org/bluez/hci0/dev_6F_A3_4A_00_4A_45
+Device address: 6F:A3:4A:00:4A:45
+Device RSSI: -88
+-----------------------------------------------------------
+**********************************************************************
+List of known devices
+**********************************************************************
+1) Unknow name, Address: 70:E4:E6:5E:A3:88
+2) Unknow name, Address: 51:5C:57:55:52:31
+3) Name: Pepper_C1-1A6188, Address: 24:6F:28:1A:61:8A
+4) Name: Redmi, Address: 18:01:F1:1D:F4:40
+5) Name: DESKTOP-6ETM3VT, Address: 74:4C:A1:7A:3F:A0
+6) Name: ORD00148, Address: 5C:80:B6:49:9A:CA
+7) Unknow name, Address: 6F:A3:4A:00:4A:45
+Device Pepper_C1-1A6188 is already connected
+Properties changed
+Path: /org/bluez/hci0/dev_18_01_F1_1D_F4_40
+Device Name: Redmi
+Device Address: 18:01:F1:1D:F4:40
+Device RSSI: -57
+-----------------------------------------------------------
+**********************************************************************
+List of known devices
+**********************************************************************
+1) Unknow name, Address: 70:E4:E6:5E:A3:88
+2) Unknow name, Address: 51:5C:57:55:52:31
+3) Name: Pepper_C1-1A6188, Address: 24:6F:28:1A:61:8A
+4) Name: Redmi, Address: 18:01:F1:1D:F4:40
+5) Name: DESKTOP-6ETM3VT, Address: 74:4C:A1:7A:3F:A0
+6) Name: ORD00148, Address: 5C:80:B6:49:9A:CA
+7) Unknow name, Address: 6F:A3:4A:00:4A:45
+Device Pepper_C1-1A6188 is already connected
+received buf 
+{'topic': 'INVENTORY_START', 'payload': '1', 'name': 'ECCEL_READER'}
+{'topic': 'INVENTORY_START', 'payload': '1', 'name': 'ECCEL_READER'}
+[ECCEL_RFID_READER@172.17.0.1]data is [147, 1]
+command send to ECCEL reader  F5 04 00 FB FF 93 01 96 40
+Char notification received
+write to /org/bluez/hci0/dev_24_6F_28_1A_61_8A/service0028/char0029 suceeed
+**********************************************************************
+List of known devices
+**********************************************************************
+1) Unknow name, Address: 70:E4:E6:5E:A3:88
+2) Unknow name, Address: 51:5C:57:55:52:31
+3) Name: Pepper_C1-1A6188, Address: 24:6F:28:1A:61:8A
+4) Name: Redmi, Address: 18:01:F1:1D:F4:40
+5) Name: DESKTOP-6ETM3VT, Address: 74:4C:A1:7A:3F:A0
+6) Name: ORD00148, Address: 5C:80:B6:49:9A:CA
+7) Unknow name, Address: 6F:A3:4A:00:4A:45
+Device Pepper_C1-1A6188 is already connected
+**********************************************************************
+List of known devices
+**********************************************************************
+1) Unknow name, Address: 70:E4:E6:5E:A3:88
+2) Unknow name, Address: 51:5C:57:55:52:31
+3) Name: Pepper_C1-1A6188, Address: 24:6F:28:1A:61:8A
+4) Name: Redmi, Address: 18:01:F1:1D:F4:40
+5) Name: DESKTOP-6ETM3VT, Address: 74:4C:A1:7A:3F:A0
+6) Name: ORD00148, Address: 5C:80:B6:49:9A:CA
+7) Unknow name, Address: 6F:A3:4A:00:4A:45
+Device Pepper_C1-1A6188 is already connected
+**********************************************************************
+List of known devices
+**********************************************************************
+1) Unknow name, Address: 70:E4:E6:5E:A3:88
+2) Unknow name, Address: 51:5C:57:55:52:31
+3) Name: Pepper_C1-1A6188, Address: 24:6F:28:1A:61:8A
+4) Name: Redmi, Address: 18:01:F1:1D:F4:40
+5) Name: DESKTOP-6ETM3VT, Address: 74:4C:A1:7A:3F:A0
+6) Name: ORD00148, Address: 5C:80:B6:49:9A:CA
+7) Unknow name, Address: 6F:A3:4A:00:4A:45
+Device Pepper_C1-1A6188 is already connected
+^CKeyboard interrupt handler
+Clear: Client shutting down
+^CKeyboard interrupt handler
+Clear: Client shutting down
+Exception ignored in: <module 'threading' from '/usr/lib/python3.9/threading.py'>
