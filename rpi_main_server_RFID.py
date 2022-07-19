@@ -27,6 +27,7 @@ import pickle as cPickle
 import select
 from binascii import hexlify
 import time
+import math
 
 sys.path.insert(0,'.')
 # define the bluetooth controler
@@ -35,6 +36,8 @@ adapter_path = None
 adapter_proxy = None
 device_interface = None
 
+MAX_BLCK_CNT_PER_READ = 2
+MAX_BLCK_CNT_PER_WRITE = MAX_BLCK_CNT_PER_READ 
 mainLoop = None
 timer_id = None
 managed_objects_nbr = 0
@@ -48,13 +51,14 @@ managed_objects = None
 src_resolved_ok = False
 quat_read_id = 0
 quat_time_tag =0
+reboot_ctr =0
+MAX_FAILLURE = 6
 rot_hex_x = 0
 rot_hex_y = ''
 rot_hex_z = ''
 accLin_hex_x = ''
 accLin_hex_y = ''
-
-
+colision_ctr = -1
 tcp_rx_queue = Queue()
 tcp_tx_queue = Queue()
 ble_queue = Queue()
@@ -109,6 +113,9 @@ def Interfaces_added(path, interfaces):
 	global ECCEL_send_cmd_path
 	global DEBUG_ON
 	global client 
+	global bus
+	global dev_chr_proxy_write_eccel
+	global dev_chr_interface_write_eccel
 	print("Interface added")
 
 	if btc.DEVICE_INTERFACE in interfaces:
@@ -167,10 +174,10 @@ def Interfaces_added(path, interfaces):
 			if btc.ECCEL_READ_CHARACTERISTIC_UUID == uuid:
 				Start_characteristic_notification(path)
 				ECCEL_read_path = path
-				msg["payload"] = str(uuid)
 			if btc.ECCEL_WRITE_CHARACTERISTIC_UUID == uuid:
 				ECCEL_send_cmd_path = path
-				msg["payload"] = str(uuid) 
+				dev_chr_proxy_write_eccel = bus.get_object(	btc.BLUEZ_SERVICE_NAME, path)
+				dev_chr_interface_write_eccel = dbus.Interface(dev_chr_proxy_write_eccel, btc.GATT_CHARACTERISTIC_INTERFACE)
 		flags = ''
 		for f in prop['Flags']:
 			flags = flags + f + ','
@@ -255,8 +262,6 @@ def Read_characteristic_value(chr_path):
 		print('char: {} \n Value : {}'.format(chr_path, tmp))
 		return btc.RESULT_OK
 		
-
-
 def Send_ECCEL_cmd(cmd, arg):
 	global ECCEL_send_cmd_path
 	'''
@@ -264,10 +269,10 @@ def Send_ECCEL_cmd(cmd, arg):
 	as the reader can not poll and answer to request simultaneously
 	'''
 	if ECCEL_send_cmd_path != '':
-		reset_polling()		
+		#reset_polling()		
 		to_send = ecu.Format_ECCEL_cmd(cmd, arg)
 		Write_characteristic_value(ECCEL_send_cmd_path, to_send)
-		set_polling()
+		#set_polling()
 	else:
 		print('unknow char path')
 	
@@ -289,12 +294,10 @@ def Read_descriptor_value(chr_path):
 		
 	
 def Write_characteristic_value(chr_path, value):
-	global bus
-	dev_chr_proxy = bus.get_object(	btc.BLUEZ_SERVICE_NAME, chr_path)
-	dev_chr_interface = dbus.Interface(dev_chr_proxy, btc.GATT_CHARACTERISTIC_INTERFACE)
+	global dev_chr_interface_write_eccel
 	try:
 		#text = btu.text_to_ascii_array(value)
-		dev_chr_interface.WriteValue(value, {})
+		dev_chr_interface_write_eccel.WriteValue(value, {})
 	except Exception as e:
 		print('failed to write characteristic {}'.format(chr_path))
 		print(e.get_dbus_name())
@@ -343,6 +346,9 @@ def Discovery_timeout():
 	global adapter_interface
 	global mainLoop
 	global devices
+	global tcp_rx_evt
+	global tcp_rx_queue
+	global ECCEL_connected
 	
 	#GLib.source_remove(timer_id)
 	#mainLoop.quit()
@@ -355,6 +361,21 @@ def Discovery_timeout():
 		dev_dict = devices[path]
 		if dev_dict['Address'] == BTADDR_OF_INTEREST:
 			Connect_dev(dev_dict)
+	#Send_ECCEL_cmd(etp.CMD_LIST.CMD_ICODE_INVENTORY_NEXT.value,[])
+	print("\nreadall is %d"%ecu.readall)
+	if ecu.readall == 1:
+		#This is excuted every 1 min according to the reader settings
+		Send_ECCEL_cmd(etp.CMD_LIST.CMD_ACTIVATE_TAG.value,[])
+		msg = {
+			"name":"ECCEL_READER",
+			"topic": "READ_ALL",
+			"payload":""
+				}
+		tcp_rx_queue.put(msg)
+		tcp_rx_evt.set()
+		ecu.readall = 0
+	if ECCEL_connected == False:
+		print("RFID Reader bluetooth is not active")
 	return True
 
 def Interfaces_removed(path, interfaces):
@@ -410,8 +431,10 @@ def Properties_changed(interface, changed, not_used, path):
 		print("-----------------------------------------------------------")
 		if n_s == 2:
 			if path == ECCEL_READER_PATH:
-				if src_resolved_ok:
+				if src_resolved_ok:					
+					#Send_ECCEL_cmd(etp.CMD_LIST.CMD_ICODE_INVENTORY_START.value,[])
 					set_polling()
+					pass
 		
 
 def Get_known_dev():
@@ -467,24 +490,17 @@ def reset_polling():
 	cmd = ecu.Format_ECCEL_cmd(etp.CMD_LIST.CMD_SET_POLLING.value, [0])
 	Write_characteristic_value(ECCEL_send_cmd_path, cmd)
 		
-
-def Try_custom_ICODE_cmds():
-	cmd = etp.CMD_LIST.CMD_GET_TAG_COUNT.value
-	arg = []
-	Send_ECCEL_cmd(cmd, arg)
-	cmd = etp.CMD_LIST.CMD_GET_UID.value
-	arg = [0]
-	Send_ECCEL_cmd(cmd, arg)
-	cmd = etp.CMD_LIST.CMD_MFDF_APP_IDSRROR.value
-	arg = [1]
-	Send_ECCEL_cmd(cmd, arg)
-	cmd = etp.CMD_LIST.CMD_MFDF_GET_FREEMEM.value
-	arg = []
-	Send_ECCEL_cmd(cmd, arg)
-	cmd = etp.CMD_LIST.CMD_MFU_READ_PAGE.value
-	arg = [1,2]
-	Send_ECCEL_cmd(cmd, arg)
-		
+def reboot_BLE_rfid_reader():
+	print("Rebooting RFID_READER...")
+	msgs={
+		"name":ECCEL_reader_name,
+		"topic":"CONNEXION",
+		"payload":"Rebooting"
+		}
+	tcp_tx_queue.put(msgs)
+	Send_ECCEL_cmd(etp.CMD_LIST.CMD_REBOOT.value,[])
+	Send_ECCEL_cmd(etp.CMD_LIST.CMD_PROTO_CONF.value, [etp.SUBCMD_LIST.SUBCMD_BLUETOOTH_ID.value ,etp.BLUETOOTH_SETTINGS.BLE.value])
+	
 def Connect_dev(dev_prop_dict):
 	global bus
 	global devices
@@ -493,6 +509,8 @@ def Connect_dev(dev_prop_dict):
 	global tcp_tx_queue
 	global ECCEL_connected
 	global ECCEL_reader_name
+	global reboot_ctr
+	global MAX_FAILLURE
 	
 	dev_add = dev_prop_dict['Address']
 	if 'Name' in dev_prop_dict:		
@@ -503,22 +521,24 @@ def Connect_dev(dev_prop_dict):
 			ECCEL_reader_name = str(btu.dbus_to_python(dev_prop_dict['Name']))
 			if(Is_dev_connected(device_proxy) == True):
 				print("Device {} is already connected".format(ECCEL_reader_name))
-
 				return
 			else:
 				print("-----------------------------------------------------")
 				print("Connecting to {}...".format(dev_add))
 				device_interface.Connect()
 		except Exception as e:
+			ECCEL_connected = False
 			print("Connexion failed")
 			
 			msg={
 				"name":ECCEL_reader_name,
-				"topic":"CONNECTION",
+				"topic":"CONNEXION",
 				"payload":"FAILED"
 				}
-				
-			ECCEL_connected = False
+			reboot_ctr += 1
+			if reboot_ctr >= MAX_FAILLURE:
+				reboot_BLE_rfid_reader()
+				reboot_ctr = 0
 			tcp_tx_queue.put(msg)
 			e_name = e.get_dbus_name()
 			print(e_name)
@@ -527,10 +547,10 @@ def Connect_dev(dev_prop_dict):
 				print("The device may not be in the reach of the adapter")
 			return btc.RESULT_EXCEPTION
 		else:
-			print("Connection succeed")
+			print("Connexion succeed")
 			msgs={
 				"name":ECCEL_reader_name,
-				"topic":"CONNECTION",
+				"topic":"CONNEXION",
 				"payload":"SUCCESS"
 				}
 			ECCEL_connected = True
@@ -571,7 +591,7 @@ def Disconnect_dev(dev_add):
 			print(e.get_dbus_message())
 			return btc.RESULT_EXCEPTION
 		else:
-			print("Disconnection succeed")
+			print("Disconnexion succeed")
 			
 			if device_path == ECCEL_READER_PATH:
 				print("ECCEL Reader removed")			
@@ -658,12 +678,11 @@ def receive(channel):
 		buf = channel.recv(size - buf_len)
 		buf_len = len(buf)
 	buf1 = cPickle.loads(buf)[0]
-	print("received buf \n{}".format(buf1))
 	return buf1
 	
 	
 class TCPChatClient(object):
-	"""A chat client using select"""
+	"""A chat TCP client using select"""
 	def __init__(self, name, port, host = HOSTNAME):
 		global TCP_connected
 		self.name = name
@@ -717,6 +736,10 @@ class TCPChatClient(object):
 							TCP_connected = False
 							break
 						else:
+							if 'name' in data:
+								if data['name'] == 'ACK':
+									continue
+							print("packet add to tcp queue \n{}".format(data))
 							tcp_rx_queue.put(data)
 							tcp_rx_evt.set()
 							
@@ -827,12 +850,13 @@ class RFID_send_cmdd(object):
 	def __init__(self):
 		print(" RFID_send_cmdd init")
 	def run(self):
+		global colision_ctr
 		global EXIT_APP
 		global tcp_rx_evt
 		global tcp_rx_queue
 		print ("Starting RFID_send_cmdd, Thread %d" %(threading.get_ident() ))
 		while not EXIT_APP:
-			tcp_rx_evt.wait()
+			#tcp_rx_evt.wait()
 			basic_buf = tcp_rx_queue.get()
 			tcp_rx_evt.clear()		
 			if basic_buf == None:
@@ -843,37 +867,237 @@ class RFID_send_cmdd(object):
 			buf = basic_buf
 			if "name" in buf:
 				if buf["name"] == "ECCEL_READER":
-					if buf["payload"] != None:
-						args = list(buf["payload"])
-						arg = []
-						for i in args:
-							arg.append(int(i))
+					arg =[]							
+					reset_polling()
 					if buf["topic"] == "INVENTORY_START":
-						cmd = etp.CMD_LIST.CMD_ICODE_INVENTORY_START.value
-						Send_ECCEL_cmd(cmd, arg)
+						cmd = etp.CMD_LIST.CMD_ICODE_INVENTORY_START.value					
+						Send_ECCEL_cmd(cmd, [])
 						
 					if buf["topic"] == "GET_TAG_CNT":
 						cmd = etp.CMD_LIST.CMD_GET_TAG_COUNT.value
-						Send_ECCEL_cmd(cmd, arg)
+						Send_ECCEL_cmd(cmd, [])
 						
 					if buf["topic"] == "INVENTORY_NEXT":
-						cmd = etp.CMD_LIST.CMD_ICODE_INVENTORY_NEXT.value
-						Send_ECCEL_cmd(cmd, arg)
+						cmd = etp.CMD_LIST.CMD_ICODE_INVENTORY_NEXT.value				
+						Send_ECCEL_cmd(cmd, [])
 						
-					if buf["topic"] == "READ_BLOCK":
-						cmd = etp.CMD_LIST.CMD_ICODE_READ_BLOCK.value
-						Send_ECCEL_cmd(cmd, arg)
-			
-					if buf["topic"] == "WRITE_BLOCK":
-						cmd = etp.CMD_LIST.CMD_ICODE_WRITE_BLOCK.value
-						Send_ECCEL_cmd(cmd, arg)
-			
+					if buf["topic"] == "GET_TAG_NAME":
+						read_tag_name()
+					if buf["topic"] == "SET_TAG_NAME":
+						if "payload" in buf:
+							arg = buf["payload"]							
+							data = [ord(c) for c in arg]
+							icode_write_blocks(etp.TAG_MEMORY_LAYOUT.TAG_NAME.value,etp.TAG_MEMORY_LAYOUT.TAG_NAME_CNT.value, data)
+						
+					if buf["topic"] == "GET_TAG_DATESTART":
+						read_tag_datestart()
+					if buf["topic"] == "SET_TAG_DATESTART":
+						if "payload" in buf:
+							arg = buf["payload"].split("/")		
+							data = []				
+							for i in range(0, 5-len(arg)):
+								arg.append(0)		
+							for i in range(0, 5):
+								if arg[i] == "":
+									arg[i] = '0'
+								data.append(int(arg[i]))
+							icode_write_blocks(etp.TAG_MEMORY_LAYOUT.TAG_DATESTART.value,etp.TAG_MEMORY_LAYOUT.TAG_DATESTART_CNT.value, data)
+						 
+					if buf["topic"] == "GET_TAG_DATESTOP":
+						read_tag_datestop()
+					if buf["topic"] == "SET_TAG_DATESTOP":
+						if "payload" in buf:
+							arg = buf["payload"].split("/")	
+							data = []					
+							for i in range(0, 5-len(arg)):
+								arg.append(0)			
+							for i in range(0, 5):
+								if arg[i] == "":
+									arg[i] = '0'
+								data.append(int(arg[i]))
+							icode_write_blocks(etp.TAG_MEMORY_LAYOUT.TAG_DATESTOP.value,etp.TAG_MEMORY_LAYOUT.TAG_DATESTOP_CNT.value, data)
+						
+					if buf["topic"] == "GET_TAG_EXPNBR":
+						read_tag_expnbr()
+					if buf["topic"] == "SET_TAG_EXPNBR":
+						if "payload" in buf:						
+							data = [int(buf["payload"])]
+							icode_write_blocks(etp.TAG_MEMORY_LAYOUT.TAG_EXPNBR.value,etp.TAG_MEMORY_LAYOUT.TAG_EXPNBR_CNT.value, data)
+						
+					if buf["topic"] == "GET_TAG_COMMENTS":
+						read_tag_comments()
+					if buf["topic"] == "SET_TAG_COMMENTS":
+						if "payload" in buf:
+							arg = buf["payload"]							
+							data = [ord(c) for c in arg]
+							icode_write_blocks(etp.TAG_MEMORY_LAYOUT.TAG_COMMENTS.value,etp.TAG_MEMORY_LAYOUT.TAG_COMMENTS_CNT.value, data)
+						
+					
+					if buf["topic"] == "READ_ALL":
+						read_tag_all_infos()
 					if buf["topic"] == "GET_SYS_INFOS":
 						cmd = etp.CMD_LIST.CMD_ICODE_GET_SYSTEM_INFOS.value
 						Send_ECCEL_cmd(cmd, arg)
+						
+					if buf["topic"] == "SET_POLLING":
+						set_polling()
+					if buf["topic"] == "RESET_POLLING":
+						reset_polling()							
+					set_polling()
+					
 			
 		print ("Exiting RFID_send_cmdd, Thread %d" %(threading.get_ident() ))
+def read_tag_all_infos():
+	read_tag_name()
+	read_tag_expnbr()
+	read_tag_datestart()
+	read_tag_datestop()
+	read_tag_comments()
+	
+def read_tag_expnbr():
+	icode_read_blocks(etp.TAG_MEMORY_LAYOUT.TAG_EXPNBR.value,etp.TAG_MEMORY_LAYOUT.TAG_EXPNBR_CNT.value)
+	Send_ECCEL_cmd(etp.CMD_LIST.CMD_DUMMY_COMMAND.value, [])
+	while ecu.dmc_received == 0:
+		pass
+	ecu.dmc_received = 0
+	nbr =0
+	print("ecu.tag_expnbr_list : {}".format(ecu.tag_expnbr_list))	
+	for i in range(0,len(ecu.tag_expnbr_list)):
+		nbr += ecu.tag_expnbr_list[i] << (8*i)
+	msg["name"] = "Pepper_C1-1A6188"
+	msg["topic"] = "GET_TAG_EXPNBR"
+	msg["payload"] = nbr
+	tcp_tx_queue.put(msg)
+	
+def read_tag_comments():
+	icode_read_blocks(etp.TAG_MEMORY_LAYOUT.TAG_COMMENTS.value,etp.TAG_MEMORY_LAYOUT.TAG_COMMENTS_CNT.value)
+	Send_ECCEL_cmd(etp.CMD_LIST.CMD_DUMMY_COMMAND.value, [])
+	while ecu.dmc_received == 0:
+		pass
+	ecu.dmc_received = 0
+	text =""
+	for i in ecu.tag_comments_list:
+		if i == 0:
+			break
+		text += chr(i)
+	ecu.tag_comments_list = []
+	msg["name"] = "Pepper_C1-1A6188"
+	msg["topic"] = "GET_TAG_COMMENTS"
+	msg["payload"] = text
+	tcp_tx_queue.put(msg)
+
+
+def read_tag_name():
+	icode_read_blocks(etp.TAG_MEMORY_LAYOUT.TAG_NAME.value,etp.TAG_MEMORY_LAYOUT.TAG_NAME_CNT.value)
+	Send_ECCEL_cmd(etp.CMD_LIST.CMD_DUMMY_COMMAND.value, [])
+	while ecu.dmc_received == 0:
+		pass
+	ecu.dmc_received = 0
+	text =""
+	for i in ecu.tag_name_list:
+		if i == 0:
+			break
+		text += chr(i)
+	ecu.tag_name_list = []
+	msg["name"] = "Pepper_C1-1A6188"
+	msg["topic"] = "GET_TAG_NAME"
+	msg["payload"] = text
+	tcp_tx_queue.put(msg)
+	
+
+def read_tag_datestart():
+	icode_read_blocks(etp.TAG_MEMORY_LAYOUT.TAG_DATESTART.value,etp.TAG_MEMORY_LAYOUT.TAG_DATESTART_CNT.value)
+	Send_ECCEL_cmd(etp.CMD_LIST.CMD_DUMMY_COMMAND.value, [])
+	while ecu.dmc_received == 0:
+		pass
+	ecu.dmc_received = 0
+	msg["name"] = "Pepper_C1-1A6188"
+	msg["topic"] = "GET_TAG_DATESTART"
+	if len(ecu.tag_datestart_list) < 5:
+		msg["payload"] = "ERR_OCCURED"
+	else:
+		date_str = str(ecu.tag_datestart_list[0]) + '/' + str(ecu.tag_datestart_list[1]) + '/' + str(ecu.tag_datestart_list[2])
+		time_str = str(ecu.tag_datestart_list[3]) + ':' + str(ecu.tag_datestart_list[4])	
+		msg["payload"] = date_str + ' | ' + time_str
+	ecu.tag_datestart_list = []
+	tcp_tx_queue.put(msg)
+
+def read_tag_datestop():
+	icode_read_blocks(etp.TAG_MEMORY_LAYOUT.TAG_DATESTOP.value,etp.TAG_MEMORY_LAYOUT.TAG_DATESTOP_CNT.value)
+	Send_ECCEL_cmd(etp.CMD_LIST.CMD_DUMMY_COMMAND.value, [])
+	while ecu.dmc_received == 0:
+		pass
+	ecu.dmc_received = 0	
+	msg["name"] = "Pepper_C1-1A6188"
+	msg["topic"] = "GET_TAG_DATESTOP"
+	if len(ecu.tag_datestop_list) < 5:
+		msg["payload"] = "ERR_OCCURED"
+	else:
+		date_str = str(ecu.tag_datestop_list[0]) + '/' + str(ecu.tag_datestop_list[1]) + '/' + str(ecu.tag_datestop_list[2])
+		time_str = str(ecu.tag_datestop_list[3]) + ':' + str(ecu.tag_datestop_list[4])
+		msg["payload"] = date_str + ' | ' + time_str
+	ecu.tag_datestop_list = []
+	tcp_tx_queue.put(msg)
+
+def icode_read_blocks(start_block, block_count):
+	global colision_ctr
+	ecu.block_name = etp.MEMORY_BLOCK_NAME[start_block]
+	if block_count == 0:
+		return -1
+	if start_block == 0:
+		return -1
+	cmd = etp.CMD_LIST.CMD_ICODE_READ_BLOCK.value
+	nbr_read = block_count/MAX_BLCK_CNT_PER_READ
+	current_block = start_block
+	if nbr_read > 0:		
+		for i in range(0, math.floor(nbr_read)):	
+			args = [current_block, MAX_BLCK_CNT_PER_READ]
+			Send_ECCEL_cmd(cmd, args)
+			current_block += MAX_BLCK_CNT_PER_READ
 			
+	if current_block >= start_block + block_count:
+		pass
+	else:
+		args = [current_block, 1]
+		Send_ECCEL_cmd(cmd, args)
+			
+	return 0
+
+def icode_write_blocks(start_block, block_count, data):
+	if block_count == 0:
+		return
+	if start_block == 0:
+		return
+	
+	ecu.block_name = etp.MEMORY_BLOCK_NAME[start_block].replace('G','S',1)	
+	cmd = etp.CMD_LIST.CMD_ICODE_WRITE_BLOCK.value
+	current_block = start_block
+	data_len = len(data)	
+	#data_len should be a multiple of 4
+	l = (data_len)%4
+	for i in range(0,4-l):
+		data.append(0)
+	data_len = len(data)	
+	pos = etp.OCTETS_PER_ICODE_BLOCK*MAX_BLCK_CNT_PER_WRITE
+	nbr_single_write = int(data_len / etp.OCTETS_PER_ICODE_BLOCK)
+	nbr_double_write = math.floor(data_len / pos)
+	data_read_cnt = 0
+	if 	nbr_double_write > 0 :
+		for i in range(0, nbr_double_write):
+				args = [current_block, MAX_BLCK_CNT_PER_WRITE]
+				for j in range(i*pos, (i+1)*pos):
+					args.append(data[j])
+				Send_ECCEL_cmd(cmd, args)
+				current_block += MAX_BLCK_CNT_PER_WRITE	
+		data_read_cnt = nbr_double_write * MAX_BLCK_CNT_PER_WRITE
+		nbr_single_write = nbr_single_write - data_read_cnt
+	for i in range(0, nbr_single_write):
+		args = [current_block, 1]
+		for j in range((i + data_read_cnt)*etp.OCTETS_PER_ICODE_BLOCK, data_len if (i+1+ data_read_cnt)*etp.OCTETS_PER_ICODE_BLOCK  > data_len else (i+1+ data_read_cnt)*etp.OCTETS_PER_ICODE_BLOCK):
+			args.append(data[j])
+		Send_ECCEL_cmd(cmd, args)
+		current_block += 1	
+		
 class Process_BLE_msgs(object):
 	def __init__(self):
 		print(" Process BLE send msgs init")
@@ -900,6 +1124,8 @@ class Process_BLE_msgs(object):
 			if t == ECCEL_BLE_EVT:		
 				if text[0] == 0xF5:
 					buf = ecu.Process_ECCEL_read_data(text)
+					if buf is None:
+						continue
 					msg["topic"] = buf["topic"] 
 					msg["payload"] = buf["payload"]
 				else:
@@ -907,11 +1133,9 @@ class Process_BLE_msgs(object):
 					msg["payload"] = "ERR"
 				msg["name"] = ECCEL_reader_name
 				tcp_tx_queue.put(msg)
-				print('Writing {} to the queue'.format(msg))
 			text =""
 		print ("Exiting Process BLE send msgs, Thread %d" %(threading.get_ident()  ))
 			
-				
 if __name__ == '__main__':	
 	parser = argparse.ArgumentParser(description = 'First trial program')
 	parser.add_argument('-t','--timeout', action = "store", dest = "timeout", type = int, required = True)
@@ -925,6 +1149,7 @@ if __name__ == '__main__':
 	timeout = given_args.timeout
 	ECCEL_BLE_EVT = 0
 	TCP_connected = False
+	#bluetooth connexion ok?
 	ECCEL_connected = False
 	
 	scanTime = timeout* 1000
