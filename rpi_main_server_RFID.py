@@ -68,7 +68,8 @@ ble_evt = Event()
 tcp_rx_evt.clear()
 ble_evt.clear()
 
-ECCEL_READER_BDADDR='24:6F:28:1A:61:8A'
+ECCEL_READER_BDADDR1='24:6F:28:1A:61:8A'
+ECCEL_READER_BDADDR2='8C:AA:B5:80:19:D2'
 ECCEL_READER_PATH = ""
 ECCEL_reader_name = ''
 
@@ -78,7 +79,7 @@ msg = {
 "payload":"" 
 }
 
-BTADDR_OF_INTEREST= ECCEL_READER_BDADDR
+BTADDR_OF_INTEREST= ECCEL_READER_BDADDR2
 
 HOSTNAME = '172.17.0.1'
 TCP_HOSTNAME = '172.17.0.1'
@@ -136,7 +137,7 @@ def Interfaces_added(path, interfaces):
 				add = dev['Address']
 				msg["payload"] = str(add)
 				print("Device address: {}".format(add))
-				if add == ECCEL_READER_BDADDR:
+				if add == BTADDR_OF_INTEREST:
 					print("ECCEL Reader added")
 					ECCEL_READER_PATH = path
 			if 'RSSI' in dev:
@@ -361,19 +362,26 @@ def Discovery_timeout():
 		dev_dict = devices[path]
 		if dev_dict['Address'] == BTADDR_OF_INTEREST:
 			Connect_dev(dev_dict)
-	#Send_ECCEL_cmd(etp.CMD_LIST.CMD_ICODE_INVENTORY_NEXT.value,[])
+	Send_ECCEL_cmd(etp.CMD_LIST.CMD_ICODE_INVENTORY_NEXT.value,[])
 	print("\nreadall is %d"%ecu.readall)
 	if ecu.readall == 1:
 		#This is excuted every 1 min according to the reader settings
-		Send_ECCEL_cmd(etp.CMD_LIST.CMD_ACTIVATE_TAG.value,[])
+		#Send_ECCEL_cmd(etp.CMD_LIST.CMD_ACTIVATE_TAG.value,[])
 		msg = {
 			"name":"ECCEL_READER",
 			"topic": "READ_ALL",
 			"payload":""
 				}
-		tcp_rx_queue.put(msg)
-		tcp_rx_evt.set()
+
 		ecu.readall = 0
+	else:
+		msg = {
+			"name":"ECCEL_READER",
+			"topic": "TAG_INVENTORY_NEXT",
+			"payload":""
+				}
+	tcp_rx_queue.put(msg)
+	tcp_rx_evt.set()
 	if ECCEL_connected == False:
 		print("RFID Reader bluetooth is not active")
 	return True
@@ -432,8 +440,10 @@ def Properties_changed(interface, changed, not_used, path):
 		if n_s == 2:
 			if path == ECCEL_READER_PATH:
 				if src_resolved_ok:					
-					#Send_ECCEL_cmd(etp.CMD_LIST.CMD_ICODE_INVENTORY_START.value,[])
-					set_polling()
+					Send_ECCEL_cmd(etp.CMD_LIST.CMD_ICODE_INVENTORY_START.value,[])
+					#Send_ECCEL_cmd(etp.CMD_LIST.CMD_GET_TAG_COUNT.value,[])
+					#Send_ECCEL_cmd(etp.CMD_LIST.CMD_GET_UID.value,[1])
+					#set_polling()
 					pass
 		
 
@@ -868,7 +878,7 @@ class RFID_send_cmdd(object):
 			if "name" in buf:
 				if buf["name"] == "ECCEL_READER":
 					arg =[]							
-					reset_polling()
+					#reset_polling()
 					if buf["topic"] == "INVENTORY_START":
 						cmd = etp.CMD_LIST.CMD_ICODE_INVENTORY_START.value					
 						Send_ECCEL_cmd(cmd, [])
@@ -943,7 +953,7 @@ class RFID_send_cmdd(object):
 						set_polling()
 					if buf["topic"] == "RESET_POLLING":
 						reset_polling()							
-					set_polling()
+					#set_polling()
 					
 			
 		print ("Exiting RFID_send_cmdd, Thread %d" %(threading.get_ident() ))
@@ -964,6 +974,7 @@ def read_tag_expnbr():
 	print("ecu.tag_expnbr_list : {}".format(ecu.tag_expnbr_list))	
 	for i in range(0,len(ecu.tag_expnbr_list)):
 		nbr += ecu.tag_expnbr_list[i] << (8*i)
+	ecu.tag_expnbr_list = []
 	msg["name"] = "Pepper_C1-1A6188"
 	msg["topic"] = "GET_TAG_EXPNBR"
 	msg["payload"] = nbr
