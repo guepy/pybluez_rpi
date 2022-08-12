@@ -665,8 +665,13 @@ def send(channel, *args):
 	value = socket.htonl(len(buf))
 	size = struct.pack("L", value)
 	print("sending msg\n {}".format(args))
-	channel.send(size)
-	channel.send(buf)
+	try:
+		channel.send(size)
+		channel.send(buf)
+	except Exception as e:
+		print('send failed, make sure you are still connected. Exception: %s' %str(e))
+		TCP_connected = False
+		
 	
 def receive(channel):
 	
@@ -724,7 +729,14 @@ class TCPChatClient(object):
 			addr = data.split('CLIENT: ')[1]
 			self.prompt = '[' + '@'.join((self.name, addr)) + ']'
 		except Exception as e:
-			print("The received msg does not match the expected format")	
+			print("The received msg does not match the expected format")
+		p = "FAILED" if ECCEL_connected == False else "SUCCESS"
+		msg={
+			"name":ECCEL_reader_name,
+			"topic":"CONNEXION",
+			"payload":p
+			}	
+		send(TCP_sock, msg);
 	def run(self):
 		"""
 		chat cleint main loop
