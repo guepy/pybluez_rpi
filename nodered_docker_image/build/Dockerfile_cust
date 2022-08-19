@@ -1,0 +1,20 @@
+
+FROM guepydocker/rpinodered
+
+RUN npm upgrade 
+RUN npm i --package-lock-only
+RUN npm audit fix
+
+COPY ./volumes/rpinodered/_data/package.json .
+
+COPY --chown=node-red:node-red ./volumes/rpinodered/_data/ /data/
+
+RUN npm install --unsafe-perm --no-update-notifier --no-audit \
+				--only=production
+				
+WORKDIR /usr/src/node-red
+COPY --chown=node-red:node-red /usr/src/node-red/ /usr/src/node-red
+
+
+USER node-red
+CMD ["npm", "start"]
