@@ -1,0 +1,32 @@
+version: '2'
+
+services:
+	ble_app:
+		build:
+			context: ../ble_app
+			dockerfile: Dockerfile
+		container_name: ble_app
+		links:
+			- rpinodered
+		depends_on:
+			- nodered_app
+		network_mode: "host"
+		networks:
+			- nodered_ble
+	nodered_app:
+		build:
+			context: ../nodered
+			dockerfile: Dockerfile
+		container_name: rpinodered
+		links:
+			- ble_app
+		network_mode: "host"
+		networks:
+			- nodered_ble
+		volume:
+			- type: bind
+			source: $HOME/rfidproject
+			target: /data
+networks:
+	- nodered_ble
+	

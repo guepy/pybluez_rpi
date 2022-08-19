@@ -1,0 +1,68 @@
+Now connected to server 172.17.0.1 @ port 3355
+sending msg
+ ('NAME: ECCEL_RFID_READER',)
+ RFID_send_cmdd init
+ Process BLE send msgs init
+Starting TCP Chat client, Thread 3039933504
+[ECCEL_RFID_READER@172.17.0.1]Starting RFID_send_cmdd, Thread 3030381632
+Starting Process BLE send msgs, Thread 3019895872
+waiting to receive ble notification from the reader
+List of already known devices:
+---- Existing paths ---
+Path 1: /org/bluez/hci0/dev_24_6F_28_1A_61_8A
+Address: 24:6F:28:1A:61:8A
+-----------------------------------------------------
+Scanning new one...
+-----------------------------------------------------
+Disconnecting from 24:6F:28:1A:61:8A...
+Disconnection succeed
+-----------------------------------------------------
+Removing 24:6F:28:1A:61:8A...
+Removing succeed
+Interface added
+New device: /org/bluez/hci0/dev_48_C4_79_85_94_A0
+Device address: 48:C4:79:85:94:A0
+Device RSSI: -81
+-----------------------------------------------------------
+Interface added
+New device: /org/bluez/hci0/dev_55_31_36_35_BD_9E
+Device address: 55:31:36:35:BD:9E
+Device RSSI: -70
+-----------------------------------------------------------
+Interface added
+New device: /org/bluez/hci0/dev_33_DA_22_0B_5D_F8
+Device address: 33:DA:22:0B:5D:F8
+Device RSSI: -81
+-----------------------------------------------------------
+Interface added
+New device: /org/bluez/hci0/dev_43_D2_82_B8_11_FF
+Device address: 43:D2:82:B8:11:FF
+Device RSSI: -78
+-----------------------------------------------------------
+Interface added
+New device: /org/bluez/hci0/dev_79_18_F4_28_26_DB
+Device address: 79:18:F4:28:26:DB
+Device RSSI: -83
+-----------------------------------------------------------
+Properties changed
+Path: /org/bluez/hci0/dev_24_6F_28_1A_61_8A
+Device Name: Pepper_C1-1A6188
+Device Address: 24:6F:28:1A:61:8A
+ServicesResolved: False
+-----------------------------------------------------------
+Properties changed
+Path: /org/bluez/hci0/dev_24_6F_28_1A_61_8A
+Device Name: Pepper_C1-1A6188
+Device Address: 24:6F:28:1A:61:8A
+-----------------------------------------------------------
+Deleting device's address 24:6F:28:1A:61:8A...
+-----------------------------------------------------------
+Interface added
+New device: /org/bluez/hci0/dev_24_6F_28_1A_61_8A
+Device Name: Pepper_C1-1A6188
+Device address: 24:6F:28:1A:61:8A
+ECCEL Reader added
+Device RSSI: -56
+-----------------------------------------------------------
+Keyboard interrupt handler
+Keyboard interrupt handler

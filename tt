@@ -1,0 +1,262 @@
+Now connected to server 172.17.0.1 @ port 3355
+sending msg
+ ('NAME: ECCEL_RFID_READER',)
+FAILED
+sending msg
+ ({'name': '', 'topic': 'CONNEXION', 'payload': 'FAILED'},)
+ RFID_send_cmdd init
+ Process BLE send msgs init
+Starting TCP Chat client, Thread 3040097344
+[ECCEL_RFID_READER@172.17.0.1][ECCEL_RFID_READER@172.17.0.1]Starting RFID_send_cmdd, Thread 3030381632
+Starting Process BLE send msgs, Thread 3019895872
+waiting to receive ble notification from the reader
+List of already known devices:
+---- Existing paths ---
+Path 1: /org/bluez/hci0/dev_5C_80_B6_49_9A_CA
+Address: 5C:80:B6:49:9A:CA
+-----------------------------------------------------
+Path 2: /org/bluez/hci0/dev_B4_B6_76_A6_4F_86
+Address: B4:B6:76:A6:4F:86
+-----------------------------------------------------
+Path 3: /org/bluez/hci0/dev_8C_AA_B5_80_19_D2
+Address: 8C:AA:B5:80:19:D2
+-----------------------------------------------------
+Path 4: /org/bluez/hci0/dev_4F_80_70_CB_FF_F1
+Address: 4F:80:70:CB:FF:F1
+-----------------------------------------------------
+Scanning new one...
+-----------------------------------------------------
+Disconnecting from 5C:80:B6:49:9A:CA...
+Disconnexion succeed
+-----------------------------------------------------
+Removing 5C:80:B6:49:9A:CA...
+Removing succeed
+-----------------------------------------------------
+Disconnecting from B4:B6:76:A6:4F:86...
+Disconnexion succeed
+-----------------------------------------------------
+Removing B4:B6:76:A6:4F:86...
+Removing succeed
+-----------------------------------------------------
+Disconnecting from 8C:AA:B5:80:19:D2...
+Disconnexion succeed
+-----------------------------------------------------
+Removing 8C:AA:B5:80:19:D2...
+Removing succeed
+-----------------------------------------------------
+Disconnecting from 4F:80:70:CB:FF:F1...
+Disconnexion succeed
+-----------------------------------------------------
+Removing 4F:80:70:CB:FF:F1...
+Removing succeed
+Deleting device's address 5C:80:B6:49:9A:CA...
+-----------------------------------------------------------
+Deleting device's address B4:B6:76:A6:4F:86...
+-----------------------------------------------------------
+Properties changed
+Path: /org/bluez/hci0/dev_4F_80_70_CB_FF_F1
+Device Address: 4F:80:70:CB:FF:F1
+Device RSSI: -68
+-----------------------------------------------------------
+Properties changed
+Path: /org/bluez/hci0/dev_8C_AA_B5_80_19_D2
+Device Name: Pepper_C1-1A6188
+Device Address: 8C:AA:B5:80:19:D2
+ServicesResolved: False
+-----------------------------------------------------------
+Properties changed
+Path: /org/bluez/hci0/dev_8C_AA_B5_80_19_D2
+Device Name: Pepper_C1-1A6188
+Device Address: 8C:AA:B5:80:19:D2
+-----------------------------------------------------------
+Deleting device's address 8C:AA:B5:80:19:D2...
+-----------------------------------------------------------
+Deleting device's address 4F:80:70:CB:FF:F1...
+-----------------------------------------------------------
+Interface added
+New device: /org/bluez/hci0/dev_8C_AA_B5_80_19_D2
+Device Name: Pepper_C1-1A6188
+Device address: 8C:AA:B5:80:19:D2
+ECCEL Reader added
+Device RSSI: -69
+-----------------------------------------------------------
+**********************************************************************
+List of known devices
+**********************************************************************
+1) Name: Pepper_C1-1A6188, Address: 8C:AA:B5:80:19:D2
+-----------------------------------------------------
+Connecting to 8C:AA:B5:80:19:D2...
+Connexion succeed
+unknow char path
+
+readall is 0
+sending msg
+ ({'name': 'Pepper_C1-1A6188', 'topic': 'CONNEXION', 'payload': 'SUCCESS'},)
+Interface added
+New device: /org/bluez/hci0/dev_B4_B6_76_A6_4F_86
+Device Name: ORD04112
+Device address: B4:B6:76:A6:4F:86
+Device RSSI: -55
+-----------------------------------------------------------
+[ECCEL_RFID_READER@172.17.0.1]**********************************************************************
+List of known devices
+**********************************************************************
+1) Name: Pepper_C1-1A6188, Address: 8C:AA:B5:80:19:D2
+2) Name: ORD04112, Address: B4:B6:76:A6:4F:86
+Device Pepper_C1-1A6188 is already connected
+unknow char path
+
+readall is 0
+Interface added
+New device: /org/bluez/hci0/dev_5C_80_B6_49_9A_CA
+Device Name: ORD00148
+Device address: 5C:80:B6:49:9A:CA
+Device RSSI: -71
+-----------------------------------------------------------
+Properties changed
+Path: /org/bluez/hci0/dev_8C_AA_B5_80_19_D2
+Device Name: Pepper_C1-1A6188
+Device Address: 8C:AA:B5:80:19:D2
+Device RSSI: -69
+-----------------------------------------------------------
+Interface added
+Service Path: /org/bluez/hci0/dev_8C_AA_B5_80_19_D2/service0001
+Service UUID: 00001801-0000-1000-8000-00805f9b34fb
+Service Name: Generic Attribute Service
+-----------------------------------------------------------
+Interface added
+Charractetitic Path: /org/bluez/hci0/dev_8C_AA_B5_80_19_D2/service0001/char0002
+Charractetitic UUID: 00002a05-0000-1000-8000-00805f9b34fb
+Charractetitic Name: Service Changed
+Charractetitic Flags: indicate,
+-----------------------------------------------------------
+Interface added
+-----------------------------------------------------------
+Descriptor Path: /org/bluez/hci0/dev_8C_AA_B5_80_19_D2/service0001/char0002/desc0004
+Descriptor UUID: 00002902-0000-1000-8000-00805f9b34fb
+Interface added
+Service Path: /org/bluez/hci0/dev_8C_AA_B5_80_19_D2/service0028
+Service UUID: f03c26b1-3fb1-4d67-912e-4ae31159aef0
+Service Name: Unknown
+-----------------------------------------------------------
+Interface added
+Charractetitic Path: /org/bluez/hci0/dev_8C_AA_B5_80_19_D2/service0028/char0029
+Charractetitic UUID: f03c26b2-3fb1-4d67-912e-4ae31159aef0
+Charractetitic Name: Unknown
+Charractetitic Flags: read,write,notify,
+-----------------------------------------------------------
+Interface added
+-----------------------------------------------------------
+Descriptor Path: /org/bluez/hci0/dev_8C_AA_B5_80_19_D2/service0028/char0029/desc002b
+Descriptor UUID: 00002902-0000-1000-8000-00805f9b34fb
+Interface added
+Charractetitic Path: /org/bluez/hci0/dev_8C_AA_B5_80_19_D2/service0028/char002c
+Charractetitic UUID: f03c26b3-3fb1-4d67-912e-4ae31159aef0
+Charractetitic Name: Unknown
+successfully register to notifications on /org/bluez/hci0/dev_8C_AA_B5_80_19_D2/service0028/char002c
+Charractetitic Flags: read,write,notify,
+-----------------------------------------------------------
+Interface added
+-----------------------------------------------------------
+Descriptor Path: /org/bluez/hci0/dev_8C_AA_B5_80_19_D2/service0028/char002c/desc002e
+Descriptor UUID: 00002902-0000-1000-8000-00805f9b34fb
+Properties changed
+Path: /org/bluez/hci0/dev_8C_AA_B5_80_19_D2
+Device Name: Pepper_C1-1A6188
+Device Address: 8C:AA:B5:80:19:D2
+Device RSSI: -69
+ServicesResolved: True
+-----------------------------------------------------------
+command send to ECCEL reader  F5 03 00 FC FF 90 49 62
+write to /org/bluez/hci0/dev_8C_AA_B5_80_19_D2/service0028/char0029 suceeed
+Char notification received
+Char notification received
+New Pepper_C1-1A6188 notif, Value:  F5 06 00 F9 FF FF 90 02 01 19 C1
+ECCEL reader failed to execute TAG_INVENTORY_START command
+waiting to receive ble notification from the reader
+sending msg
+ ({'name': 'Pepper_C1-1A6188', 'topic': 'ERR', 'payload': 'TAG_INVENTORY_START'},)
+[ECCEL_RFID_READER@172.17.0.1]**********************************************************************
+List of known devices
+**********************************************************************
+1) Name: Pepper_C1-1A6188, Address: 8C:AA:B5:80:19:D2
+2) Name: ORD04112, Address: B4:B6:76:A6:4F:86
+3) Name: ORD00148, Address: 5C:80:B6:49:9A:CA
+Device Pepper_C1-1A6188 is already connected
+command send to ECCEL reader  F5 03 00 FC FF 91 68 72
+write to /org/bluez/hci0/dev_8C_AA_B5_80_19_D2/service0028/char0029 suceeed
+
+readall is 0
+Char notification received
+New Pepper_C1-1A6188 notif, Value:  F5 06 00 F9 FF FF 91 02 01 29 F6
+ECCEL reader failed to execute TAG_INVENTORY_NEXT command
+waiting to receive ble notification from the reader
+sending msg
+ ({'name': 'Pepper_C1-1A6188', 'topic': 'ERR', 'payload': 'TAG_INVENTORY_NEXT'},)
+[ECCEL_RFID_READER@172.17.0.1]Interface added
+New device: /org/bluez/hci0/dev_4F_80_70_CB_FF_F1
+Device address: 4F:80:70:CB:FF:F1
+Device RSSI: -71
+-----------------------------------------------------------
+**********************************************************************
+List of known devices
+**********************************************************************
+1) Name: Pepper_C1-1A6188, Address: 8C:AA:B5:80:19:D2
+2) Name: ORD04112, Address: B4:B6:76:A6:4F:86
+3) Name: ORD00148, Address: 5C:80:B6:49:9A:CA
+4) Unknow name, Address: 4F:80:70:CB:FF:F1
+Device Pepper_C1-1A6188 is already connected
+command send to ECCEL reader  F5 03 00 FC FF 91 68 72
+write to /org/bluez/hci0/dev_8C_AA_B5_80_19_D2/service0028/char0029 suceeed
+
+readall is 0
+Char notification received
+New Pepper_C1-1A6188 notif, Value:  F5 06 00 F9 FF FF 91 02 01 29 F6
+ECCEL reader failed to execute TAG_INVENTORY_NEXT command
+waiting to receive ble notification from the reader
+sending msg
+ ({'name': 'Pepper_C1-1A6188', 'topic': 'ERR', 'payload': 'TAG_INVENTORY_NEXT'},)
+[ECCEL_RFID_READER@172.17.0.1]Properties changed
+Path: /org/bluez/hci0/dev_5C_80_B6_49_9A_CA
+Device Name: ORD00148
+Device Address: 5C:80:B6:49:9A:CA
+Device RSSI: -54
+-----------------------------------------------------------
+**********************************************************************
+List of known devices
+**********************************************************************
+1) Name: Pepper_C1-1A6188, Address: 8C:AA:B5:80:19:D2
+2) Name: ORD04112, Address: B4:B6:76:A6:4F:86
+3) Name: ORD00148, Address: 5C:80:B6:49:9A:CA
+4) Unknow name, Address: 4F:80:70:CB:FF:F1
+Device Pepper_C1-1A6188 is already connected
+command send to ECCEL reader  F5 03 00 FC FF 91 68 72
+write to /org/bluez/hci0/dev_8C_AA_B5_80_19_D2/service0028/char0029 suceeed
+
+readall is 0
+Char notification received
+New Pepper_C1-1A6188 notif, Value:  F5 06 00 F9 FF FF 91 02 01 29 F6
+ECCEL reader failed to execute TAG_INVENTORY_NEXT command
+waiting to receive ble notification from the reader
+sending msg
+ ({'name': 'Pepper_C1-1A6188', 'topic': 'ERR', 'payload': 'TAG_INVENTORY_NEXT'},)
+[ECCEL_RFID_READER@172.17.0.1]**********************************************************************
+List of known devices
+**********************************************************************
+1) Name: Pepper_C1-1A6188, Address: 8C:AA:B5:80:19:D2
+2) Name: ORD04112, Address: B4:B6:76:A6:4F:86
+3) Name: ORD00148, Address: 5C:80:B6:49:9A:CA
+4) Unknow name, Address: 4F:80:70:CB:FF:F1
+Device Pepper_C1-1A6188 is already connected
+command send to ECCEL reader  F5 03 00 FC FF 91 68 72
+write to /org/bluez/hci0/dev_8C_AA_B5_80_19_D2/service0028/char0029 suceeed
+
+readall is 0
+Char notification received
+New Pepper_C1-1A6188 notif, Value:  F5 06 00 F9 FF FF 91 02 01 29 F6
+ECCEL reader failed to execute TAG_INVENTORY_NEXT command
+waiting to receive ble notification from the reader
+sending msg
+ ({'name': 'Pepper_C1-1A6188', 'topic': 'ERR', 'payload': 'TAG_INVENTORY_NEXT'},)
+[ECCEL_RFID_READER@172.17.0.1]Keyboard interrupt handler
+Keyboard interrupt handler
