@@ -1,0 +1,2620 @@
+[
+    {
+        "id": "f6f2187d.f17ca8",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "7c63b153b076dd11",
+        "type": "tab",
+        "label": "TCP Server",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "38cb4fe08e59f380",
+        "type": "tab",
+        "label": "create python virtual env",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "bb49a1162c08cc4c",
+        "type": "tab",
+        "label": "install python package",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "242db1fb80847d43",
+        "type": "tab",
+        "label": "Update Agent 2",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "bbf865cfacf0c623",
+        "type": "tab",
+        "label": "OPCUA server",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "c4b025abd5ce7129",
+        "type": "tab",
+        "label": "Update Agent 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "66e5565b0922bdd1",
+        "type": "tab",
+        "label": "Kafka",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "5dde3cf4d0017d37",
+        "type": "OpcUa-Endpoint",
+        "endpoint": "opc.tcp://localhost:4840",
+        "secpol": "None",
+        "secmode": "None",
+        "login": false
+    },
+    {
+        "id": "63afe50ec5b9be6d",
+        "type": "Kafka Broker",
+        "name": "kafkanodered",
+        "hosts": [
+            {
+                "host": "172.17.0.1",
+                "port": 9092
+            }
+        ],
+        "hostsEnvVar": "",
+        "connectTimeout": "10000",
+        "requestTimeout": "3000",
+        "autoConnect": "true",
+        "idleConnection": "5",
+        "reconnectOnIdle": "true",
+        "maxAsyncRequests": "10",
+        "checkInterval": "10",
+        "selfSign": true,
+        "usetls": false,
+        "useCredentials": false
+    },
+    {
+        "id": "2175280d2bef4bef",
+        "type": "kafka-broker",
+        "name": "",
+        "hosts": "172.17.0.1:9092",
+        "selfsign": false,
+        "usetls": false,
+        "cacert": "",
+        "clientcert": "",
+        "privatekey": "",
+        "passphrase": ""
+    },
+    {
+        "id": "eda1c410c837d7b0",
+        "type": "Kafka Broker",
+        "name": "plussbroker",
+        "hosts": [
+            {
+                "host": "sun-si-pluss",
+                "port": 9092
+            }
+        ],
+        "hostsEnvVar": "",
+        "connectTimeout": "10000",
+        "requestTimeout": "30000",
+        "autoConnect": "true",
+        "idleConnection": "5",
+        "reconnectOnIdle": "true",
+        "maxAsyncRequests": "10",
+        "checkInterval": "10",
+        "selfSign": true,
+        "usetls": false,
+        "useCredentials": false
+    },
+    {
+        "id": "12d713f3e8fd1eca",
+        "type": "file",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "filename": "/data/RSV_Temperature",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "none",
+        "x": 1070,
+        "y": 360,
+        "wires": [
+            [
+                "a70c76a55049b521"
+            ]
+        ]
+    },
+    {
+        "id": "a70c76a55049b521",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1250,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "49ed28c0cd938779",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "DBI_TC_NodesID_Builder",
+        "func": "msg.topic=\"ns=\"+msg.payload[0]+\";\"+\"s=\\\"DBI \" + \"TC\" + msg.payload[1] + \"\\\"\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 344,
+        "y": 260,
+        "wires": [
+            [
+                "f6dd864fc2a88185"
+            ]
+        ]
+    },
+    {
+        "id": "9626bc6f8663224e",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[3,1]",
+        "payloadType": "bin",
+        "x": 110,
+        "y": 260,
+        "wires": [
+            [
+                "49ed28c0cd938779"
+            ]
+        ],
+        "info": "the first elt of the array is the namespace number while the second the one associated to te DBI block to read"
+    },
+    {
+        "id": "f6dd864fc2a88185",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "DB_Echange_adder",
+        "func": "msg.topic=msg.topic + \".\\\"DB_Echange\\\"\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 614,
+        "y": 360,
+        "wires": [
+            [
+                "7b0e02c6ea4027f0"
+            ]
+        ]
+    },
+    {
+        "id": "7b0e02c6ea4027f0",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "5dde3cf4d0017d37",
+        "action": "subscribe",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": "1",
+        "timeUnit": "ms",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "name": "",
+        "x": 840,
+        "y": 360,
+        "wires": [
+            [
+                "12d713f3e8fd1eca"
+            ]
+        ]
+    },
+    {
+        "id": "385571ee8c8faba1",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "DBI_JANA_NodesID_Builder",
+        "func": "msg.topic=\"ns=\"+msg.payload[0]+\";\"+\"s=\\\"DBI \" + \"JANA\" + msg.payload[1] + \"\\\"\";\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 334,
+        "y": 480,
+        "wires": [
+            [
+                "f6dd864fc2a88185"
+            ]
+        ]
+    },
+    {
+        "id": "832bca347192f790",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[3,1]",
+        "payloadType": "bin",
+        "x": 110,
+        "y": 480,
+        "wires": [
+            [
+                "385571ee8c8faba1"
+            ]
+        ],
+        "info": "the first elt of the array is the namespace number while the second the one associated to te DBI block to read"
+    },
+    {
+        "id": "8e9b85e5e279fce7",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Parametres CPU",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=3;s=\"DB Parametrage CPU\".\"Existence_PI1\"",
+        "payload": "",
+        "payloadType": "date",
+        "x": 600,
+        "y": 300,
+        "wires": [
+            [
+                "7b0e02c6ea4027f0"
+            ]
+        ]
+    },
+    {
+        "id": "ef5e877fce2bbbb6",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "\"DB Echange\".RSV_Valeur",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=3;s=\"DBI JANA2\".\"DB_Echange\".RSV_Valeur",
+        "payload": "",
+        "payloadType": "date",
+        "x": 630,
+        "y": 460,
+        "wires": [
+            [
+                "7b0e02c6ea4027f0"
+            ]
+        ]
+    },
+    {
+        "id": "422ec77718465074",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "\"DB Echange\".RSV_Valeur",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=3;s=\"DBI JANA1\".\"DB_Echange\".RSV_Valeur",
+        "payload": "",
+        "payloadType": "date",
+        "x": 590,
+        "y": 120,
+        "wires": [
+            [
+                "b61f2d27bfd8721a"
+            ]
+        ]
+    },
+    {
+        "id": "b61f2d27bfd8721a",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "5dde3cf4d0017d37",
+        "action": "subscribe",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": "2",
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "",
+        "x": 840,
+        "y": 120,
+        "wires": [
+            [
+                "b179e3dbab9a7f35"
+            ]
+        ]
+    },
+    {
+        "id": "b179e3dbab9a7f35",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1090,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "ac9d328499c52481",
+        "type": "inject",
+        "z": "7c63b153b076dd11",
+        "name": "inject TCP port",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "3355",
+        "payloadType": "num",
+        "x": 280,
+        "y": 200,
+        "wires": [
+            [
+                "9b0886080cc28dfc"
+            ]
+        ]
+    },
+    {
+        "id": "d6e2f7f3502e9649",
+        "type": "file",
+        "z": "7c63b153b076dd11",
+        "name": "chat_tcp_server.py",
+        "filename": "/data/chat_tcp_server.py",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 710,
+        "y": 200,
+        "wires": [
+            [
+                "930979f32f4478e3"
+            ]
+        ]
+    },
+    {
+        "id": "9b0886080cc28dfc",
+        "type": "template",
+        "z": "7c63b153b076dd11",
+        "name": "Python TCP Server",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "#!/bin/python3\nimport socket\nimport sys\nimport argparse\nimport socketserver as SocketServer\nimport threading\nimport signal\nimport pickle as cPickle\nimport struct\nimport select\nimport json\n\nhost0 = '172.17.0.1'\nSERVER_HOST = 'localhost'\n\nSERVER_HOST = ''\nECCEL_READER_CLIENT_COMMON_NAME = \"ECCEL_RFID_READER\"\nECCEL_READER_NAME = \"Pepper_C1-1A6188\"\nECCEL_TOPIC = \"ECCEL_READER\"\ncname =''\ndata_payload = 2048\nbacklog = 5\n\nglobal response\nresponse = {\n    \"topic\":\"\",\n    \"payload\":\"\",\n    \"name\":\"\"\n}\n'''\nenv var\n'''\n#utilities\ndef send(channel, *args):\n    \n\tbuf = cPickle.dumps(args)\n\tvalue = socket.htonl(len(buf))\n\tsize = struct.pack(\"L\", value)\n\tchannel.send(size)\n\tprint(\"\\nsending\\n {}\".format(cPickle.loads(buf)[0]))\n\tchannel.send(buf)\n\t\ndef receive(channel):\n\tsize = struct.calcsize(\"L\")\n\tsize = channel.recv(size)\n\ttry:\n\t\tsize = socket.ntohl(struct.unpack(\"L\", size)[0])\n\texcept struct.error as e:\n\t\treturn ''\n\tbuf = \"\"\n\twhile len(buf) < size:\n\t\tbuf = channel.recv(size - len(buf))\n\treturn cPickle.loads(buf)[0]\n\t\ndef tcp_endpoints(sock, m):\n    m = \"ERR_LO\" + ',' + str(m)\n    send(sock, m)\n    \nclass TCPChatServer(object):\n    \"\"\"An example of chat server using select\n    \"\"\"\n    def __init__(self, port, backlog=5):\n    \tself.clients = 0\n    \tself.clientmap = {}\n    \t#List output sockets\n    \tself.outputs = [] \n    \tself.update_agent = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n    \tself.update_agent.connect((SERVER_HOST,3340))\n    \tprint(\"Now connected to server %s @ port %d\" %(SERVER_HOST, 3340))\n    \tself.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n    \t#Enable reusing socket address\n    \tself.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)\n    \tself.server.bind((SERVER_HOST, port))\n    \tprint(\"Listening to port \" + str(port) + \"...\")\n    \tself.server.listen(backlog)\n    \t#Catch keyboardInterrupts\n    \tsignal.signal(signal.SIGINT, self.sigHandler)\n    \t\n    def sigHandler(self, signum, frame):\n    \t\"\"\" Clean up client outputs\n    \t\"\"\"\n    \t#CLose the server\n    \tprint(\"\\nShutting down the server...\")\n    \t#close exixting sockets\n    \tfor output in self.outputs:\n    \t\toutput.close()\n    \tself.server.close()\n    \tsys.exit(1)\n    def get_client_name(self, client):\n    \t\"\"\"Return the name of the client\n    \t\"\"\"\n    \tinfo = self.clientmap[client]\n    \thost,name= info[0], info[1]\n    \thost_str = '|'.join((host[0],str(host[1])))\n    \treturn '@'.join((host_str,name))\n    def get_client_common_name(self, client):\n    \t\"\"\"Return the name of the client\n    \t\"\"\"\n    \tinfo = self.clientmap[client]\n    \treturn info[1]\n\n    def run(self):\n        inputs = [self.server, sys.stdin]\n        self.outputs =[]\n        running = True\n        while running:\n            if self.clients < 1:\n                tcp_endpoints(self.update_agent, \"NO_REMOTE_RFID_READER\")\n            try:\n            \treadable, writable, exceptional = select.select(inputs, self.outputs, [])\n            except select.error as e:\n            \tprint(\"Error running select module, Exception: %s\" %str(e))\n            \tbreak\n            except Exception as e:\n            \tprint(\"Select method failed, Exception: %s\" %str(e))\n            \tbreak\n            for sock in readable:\n            \tif sock == sys.stdin:\n            \t\t#handle standard inputs\n            \t\tjunk = sys.stdin.readline()\n            \t\t#running = False\n            \telif sock == self.server:\n            \t\t#Handle the server socket\n            \t\tclient, address = self.server.accept()\n            \t\tprint(\"Chat server: got connexion %d from %s\" %(client.fileno(), address))\n            \t\t#Read Login name\n            \t\ttry:\n            \t\t\tcname = receive(client).split('NAME: ')[1]\t\n            \t\texcept Exception as e:\n            \t\t\tprint(\"receive failed, connexion may have been lost. Exception: %s\"%str(e))\t\n            \t\t\tbreak\n            \t\t#compute client name and send back\n            \t\tself.clients += 1\n            \t\tsend(client, 'CLIENT: ' + str(address[0]))\n            \t\tinputs.append(client)\n            \t\tself.clientmap[client] = (address, cname)\n            \t\tif cname == ECCEL_READER_CLIENT_COMMON_NAME:\n            \t\t    tcp_endpoints(self.update_agent, \"RFID_READER FOUND\")\n            \t\tself.outputs.append(client)\n            \telse:\n            \t\t#Handle all other sockets\n            \t\ttry:\n            \t\t\tdata = receive(sock)\t\t\t\t\t\t\n            \t\t\tif data: \n            \t\t\t    self.process_incomming_tcp_data(sock, data)\n            \t\t\telse:\n            \t\t\t\tprint(\"Chat server: %d hung up\" %sock.fileno())\n            \t\t\t\tself.clients -= 1\n            \t\t\t\tsock.close()\n            \t\t\t\tinputs.remove(sock)\n            \t\t\t\tself.outputs.remove(sock)\n            \t\t\t\t'''\n            \t\t        #Sending client leaving infos to others\n            \t\t\t\tmsg = \"\\n(Now hung up: Client from %s)\" %self.get_client_name(sock)\n            \t\t\t\tfor output in self.outputs:\n            \t\t\t\t\tsend(output, msg)\t\n            \t\t\t\t'''\n            \t\texcept Exception as e:\n            \t\t\tprint(\"\\nSocket error occured, Exception: %s\" %str(e))\n            \t\t\tinputs.remove(sock)\n            \t\t\tself.outputs.remove(sock)\n        self.server.close()\n        \n    def process_incomming_tcp_data(self, sock, data):\t\n        # Send as new client's message\n        print(data)\n        response = {\n            \"name\":\"ACK\",\n            \"topic\":\"\",\n            \"payload\":\"\"\n        }\n        send(sock, response)\n        json_data =data\n        if isinstance(data,str):\n            data = data.replace('\\'','\\\"')\n            json_data = json.loads(data)\n        if json_data[\"name\"] == ECCEL_TOPIC:\n            for client in self.outputs:\n                if self.get_client_common_name(client) == ECCEL_READER_CLIENT_COMMON_NAME:\n                    send(client, json_data)\n                    break\n                \n    \n        if json_data[\"name\"] == ECCEL_READER_NAME:\n            m = json_data[\"topic\"] + ',' + str(json_data[\"payload\"])\n            send(self.update_agent, m)\n            \n            '''\n            context.set(\"tag_UUID\",json_data[\"payload\"].split(',')[2])\n            sandboxGlobalContext.set(\"new_tag\", 1)\n            self.sandboxGlobalContext.set(\"tag_UUID\",json_data[\"payload\"].split(',')[2])\n            '''\n            \n                \n    \n\nport = {{payload}}\nname = \"Python tcp server\"\nserver = TCPChatServer(port)\nserver.run()\n\t\n\t\n",
+        "output": "str",
+        "x": 490,
+        "y": 200,
+        "wires": [
+            [
+                "d6e2f7f3502e9649"
+            ]
+        ]
+    },
+    {
+        "id": "d62212834c9b6327",
+        "type": "comment",
+        "z": "7c63b153b076dd11",
+        "name": "create a python script file and save to disk",
+        "info": "",
+        "x": 500,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "24aa18d91a4af707",
+        "type": "debug",
+        "z": "7c63b153b076dd11",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 840,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "97622625f0010fd4",
+        "type": "comment",
+        "z": "7c63b153b076dd11",
+        "name": "inject a number to the python script and display it in the debug window",
+        "info": "",
+        "x": 510,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "930979f32f4478e3",
+        "type": "debug",
+        "z": "7c63b153b076dd11",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 930,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "842f08e1baefa51c",
+        "type": "pythonshell in",
+        "z": "7c63b153b076dd11",
+        "name": "TCP Server",
+        "pyfile": "/data/chat_tcp_server.py",
+        "virtualenv": "/data/envtest",
+        "continuous": true,
+        "stdInData": true,
+        "x": 610,
+        "y": 340,
+        "wires": [
+            [
+                "24aa18d91a4af707"
+            ]
+        ]
+    },
+    {
+        "id": "7c067c8227705664",
+        "type": "inject",
+        "z": "7c63b153b076dd11",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 370,
+        "y": 340,
+        "wires": [
+            [
+                "842f08e1baefa51c"
+            ]
+        ]
+    },
+    {
+        "id": "aa6714a71d087f3a",
+        "type": "inject",
+        "z": "38cb4fe08e59f380",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 200,
+        "wires": [
+            [
+                "3ef7832135a732e7"
+            ]
+        ]
+    },
+    {
+        "id": "e4a94d642fc27912",
+        "type": "file",
+        "z": "38cb4fe08e59f380",
+        "name": "",
+        "filename": "/data/create_env.sh",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 630,
+        "y": 200,
+        "wires": [
+            [
+                "6a239075ce750c42"
+            ]
+        ]
+    },
+    {
+        "id": "3ef7832135a732e7",
+        "type": "template",
+        "z": "38cb4fe08e59f380",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "python",
+        "syntax": "plain",
+        "template": "#!/bin/bash \n\ncd /data\nls -l\npython3 -m venv envtest\nsource envtest/bin/activate\nls -l\nwhich python",
+        "output": "str",
+        "x": 400,
+        "y": 200,
+        "wires": [
+            [
+                "e4a94d642fc27912"
+            ]
+        ]
+    },
+    {
+        "id": "334a5f9926920ae5",
+        "type": "inject",
+        "z": "38cb4fe08e59f380",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 300,
+        "wires": [
+            [
+                "66ede4eb6a5f72b3"
+            ]
+        ]
+    },
+    {
+        "id": "66ede4eb6a5f72b3",
+        "type": "exec",
+        "z": "38cb4fe08e59f380",
+        "command": "chmod u+x /data/create_env.sh",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "make create_env.sh file executable",
+        "x": 480,
+        "y": 300,
+        "wires": [
+            [
+                "9cba5455ef434d54"
+            ],
+            [
+                "9cba5455ef434d54"
+            ],
+            [
+                "9cba5455ef434d54"
+            ]
+        ]
+    },
+    {
+        "id": "9cba5455ef434d54",
+        "type": "debug",
+        "z": "38cb4fe08e59f380",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 770,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "43f0fda39a68780a",
+        "type": "comment",
+        "z": "38cb4fe08e59f380",
+        "name": "create bash file that creates and activates venv",
+        "info": "In the template node we create a bash file that will create a virtual python environment and activate the environment.\n\n#!/bin/bash \n\ncd /data\nls -l\npython3 -m venv envtest\nsource envtest/bin/activate\nls -l\nwhich python",
+        "x": 440,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "458ed2607ab8beb7",
+        "type": "comment",
+        "z": "38cb4fe08e59f380",
+        "name": "make the bash file executable",
+        "info": "",
+        "x": 380,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "629e3ef002cd652c",
+        "type": "comment",
+        "z": "38cb4fe08e59f380",
+        "name": "execute the bash file",
+        "info": "",
+        "x": 350,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "1e368d93bf973d5d",
+        "type": "inject",
+        "z": "38cb4fe08e59f380",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 420,
+        "wires": [
+            [
+                "2a3f3b6277805795"
+            ]
+        ]
+    },
+    {
+        "id": "2a3f3b6277805795",
+        "type": "exec",
+        "z": "38cb4fe08e59f380",
+        "command": "bash /data/create_env.sh",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "execute create_env.sh",
+        "x": 480,
+        "y": 420,
+        "wires": [
+            [
+                "1efe878dbcdf049d"
+            ],
+            [
+                "1efe878dbcdf049d"
+            ],
+            [
+                "1efe878dbcdf049d"
+            ]
+        ]
+    },
+    {
+        "id": "1efe878dbcdf049d",
+        "type": "debug",
+        "z": "38cb4fe08e59f380",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 730,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "6a239075ce750c42",
+        "type": "debug",
+        "z": "38cb4fe08e59f380",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 850,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "9ca04a39358f3df7",
+        "type": "inject",
+        "z": "bb49a1162c08cc4c",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 300,
+        "wires": [
+            [
+                "9ae942778878466c"
+            ]
+        ]
+    },
+    {
+        "id": "9ae942778878466c",
+        "type": "exec",
+        "z": "bb49a1162c08cc4c",
+        "command": "chmod u+x /data/install_packages.sh",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "make install_packages.sh file executable",
+        "x": 520,
+        "y": 300,
+        "wires": [
+            [
+                "16264313fba8ad4a"
+            ],
+            [
+                "16264313fba8ad4a"
+            ],
+            [
+                "16264313fba8ad4a"
+            ]
+        ]
+    },
+    {
+        "id": "16264313fba8ad4a",
+        "type": "debug",
+        "z": "bb49a1162c08cc4c",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 790,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "dd35893fa8003c7f",
+        "type": "inject",
+        "z": "bb49a1162c08cc4c",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 440,
+        "wires": [
+            [
+                "ecda7395c9993856"
+            ]
+        ]
+    },
+    {
+        "id": "ecda7395c9993856",
+        "type": "exec",
+        "z": "bb49a1162c08cc4c",
+        "command": "bash /data/install_packages.sh",
+        "addpay": false,
+        "append": "",
+        "useSpawn": "true",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "execute /install_packages.sh",
+        "x": 480,
+        "y": 440,
+        "wires": [
+            [
+                "b319c549e6e7eb5a"
+            ],
+            [
+                "b319c549e6e7eb5a"
+            ],
+            [
+                "b319c549e6e7eb5a"
+            ]
+        ]
+    },
+    {
+        "id": "b319c549e6e7eb5a",
+        "type": "debug",
+        "z": "bb49a1162c08cc4c",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 710,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "9dde80ef42d0d781",
+        "type": "comment",
+        "z": "bb49a1162c08cc4c",
+        "name": "make the bash file executable",
+        "info": "",
+        "x": 420,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "47c673feb91da1bc",
+        "type": "inject",
+        "z": "bb49a1162c08cc4c",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 180,
+        "wires": [
+            [
+                "d0700922d91c396c"
+            ]
+        ]
+    },
+    {
+        "id": "b5d7ce82a785a2e1",
+        "type": "file",
+        "z": "bb49a1162c08cc4c",
+        "name": "",
+        "filename": "/data/install_packages.sh",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 730,
+        "y": 180,
+        "wires": [
+            [
+                "cb91898ab69f0291"
+            ]
+        ]
+    },
+    {
+        "id": "d0700922d91c396c",
+        "type": "template",
+        "z": "bb49a1162c08cc4c",
+        "name": "packages to install",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "python",
+        "syntax": "plain",
+        "template": "#!/bin/bash \n\ncd /data\nsource envtest/bin/activate\nls -l\nwhich python\nip addr\n#python3 -c \"import socket; srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\" \n#pip3 install socket socketserver as SocketServer threading signal picklestruct select",
+        "output": "str",
+        "x": 450,
+        "y": 180,
+        "wires": [
+            [
+                "b5d7ce82a785a2e1"
+            ]
+        ]
+    },
+    {
+        "id": "555b8ffbc9f16c84",
+        "type": "comment",
+        "z": "bb49a1162c08cc4c",
+        "name": "create bash file that installs packages",
+        "info": "",
+        "x": 390,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "873bc9bab7e2c7ae",
+        "type": "comment",
+        "z": "bb49a1162c08cc4c",
+        "name": "execute the bash file to install packages",
+        "info": "",
+        "x": 450,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "cb91898ab69f0291",
+        "type": "debug",
+        "z": "bb49a1162c08cc4c",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 950,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "ca5726b0be9b4765",
+        "type": "debug",
+        "z": "242db1fb80847d43",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": true,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 980,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "ec02ae3e775af67d",
+        "type": "template",
+        "z": "242db1fb80847d43",
+        "name": "tcp_client_file.py",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "#!/bin/python3\nimport socket\nimport sys\nimport argparse\nimport pickle as cPickle\nimport struct\nimport select\nfrom binascii import hexlify\nimport threading\nimport json\n\nHOSTNAME = 'localhost'\n\n#utilities\ndef send(channel, *args):\n\tbuf = cPickle.dumps(args)\n\tvalue = socket.htonl(len(buf))\n\tsize = struct.pack(\"L\", value)\n\tchannel.send(size)\n\tchannel.send(buf)\n\t\ndef receive(channel):\n\tsize = struct.calcsize(\"L\")\n\tsize = channel.recv(size)\n\ttry:\n\t\tsize = socket.ntohl(struct.unpack(\"L\", size)[0])\n\t\tif size > sys.maxsize:\n\t\t\treturn \"\"\n\texcept struct.error as e:\n\t\tprint('socket.ntohl failed, Exception: %s' %str(e))\n\t\treturn ''\n\texcept Exception as e:\n\t\tprint('receive failed, Exception: %s' %str(e))\n\t\treturn ''\n\tbuf = \"\"\n\tbuf_len = len(buf)\n\twhile buf_len < size:\n\t\tbuf = channel.recv(size - buf_len)\n\t\tbuf_len = len(buf)\n\t\n\treturn cPickle.loads(buf)[0]\n\t\n\t\nclass TCPChatClient(object):\n\t\"\"\"A chat client using select\"\"\"\n\tdef __init__(self, name, port, host = HOSTNAME):\n\t\tself.name = name\n\t\tself.connected = False\n\t\tself.host = host\n\t\tself.port = port\n\t\tself.msg_payload = ''\n\t\t#initial prompt\n\t\tself.prompt = '[' + '@'.join((name, socket.gethostname().split('.')[0])) + ']'\n\t\t#connect to server\n\t\ttry:\n\t\t\tself.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\n\t\t\tself.sock.connect((host,self.port))\n\t\t\tprint(\"Now connected to server %s @ port %d\" %(host, self.port))\n\t\t\tself.connected = True\n\t\t\t#send client name\n\t\t\tsend(self.sock, 'NAME: '+self.name)\n\t\t\tdata = receive(self.sock)\n\t\texcept socket.error as e:\n\t\t\tprint(\"Failed to connect to the server %s @ port %d\" %(host, port))\n\t\t\t\n\t\ttry:\n\t\t\t#received data contains the client address, set it\n\t\t\tprint(\"data received: %s\" %data)\n\t\t\taddr = data.split('CLIENT: ')[1]\n\t\t\tself.prompt = '[' + '@'.join((self.name, addr)) + ']'\n\t\texcept Exception as e:\n\t\t\tprint(\"The received msg does not match the expected format\")\n\t\t\t\n\tdef run(self):\n\t\t\"\"\"\n\t\tchat client main loop\n\t\t\"\"\"\n\t\twhile self.connected:\n\t\t\ttry:\n\t\t\t\tsys.stdout.write(self.prompt)\n\t\t\t\tsys.stdout.flush()\n\t\t\t\t#wait for input from socket or stdin\n\t\t\t\tmsg = {\n\t\t\t\t    \"topic\": \"\",\n\t\t\t\t    \"payload\":\"\",\n\t\t\t\t    \"name\":\"\"\n\t\t\t\t}\n\t\t\t\tmsg[\"topic\"] = given_args[\"topic\"]\n\t\t\t\tmsg[\"payload\"] =  given_args[\"payload\"]\n\t\t\t\tmsg[\"name\"] = given_args[\"name\"]\n\t\t\t\tself.send_msg(msg)\n\t\t\t\tprint(\"MSG SEND %s\" %msg)\n\t\t\texcept KeyboardInterrupt:\n\t\t\t\tprint(\"\\nClient interrupt\")\n\t\t\t\t#self.sock.close()\n\t\t\t\tbreak\n\t\t\texcept Exception as e:\n\t\t\t\tprint(\"Exception occured in client run: %s\" %str(e))\n\t\t\t\t#self.sock.close()\n\t\t\t\tbreak\n\tdef send_msg(self,msg):\n\t\tif self.connected:\n\t\t\tsend(self.sock, msg)\n\t\t\ttry:\n\t\t\t\treadable, writable, exceptional = select.select([self.sock], [], [], 1)\n\t\t\t\tfor sock in readable:\n\t\t\t\t\tif sock == self.sock:\n\t\t\t\t\t\ttry:\n\t\t\t\t\t\t\tdata = receive(sock)\n\t\t\t\t\t\t\t#data = json.loads(in_msg)\n\t\t\t\t\t\t\t\n\t\t\t\t\t\t\tif not data:\n\t\t\t\t\t\t\t\tprint(\"server did not acknowledge the message\")\n\t\t\t\t\t\t\telif data['name'] == 'ACK':\n\t\t\t\t\t\t\t\tprint('[message sent]')\n\t\t\t\t\t\t\t\tself.connected = False\n\t\t\t\t\t\t\telse:\n\t\t\t\t\t\t\t\tprint('unknow msg status')\n\t\t\t\t\t\texcept Exception as e:\n\t\t\t\t\t\t\tprint(\"Connexion down, Exception: %s\" %str(e))\n\t\t\t\t\t\t\t\n\t\t\t\t\telse:\t\t\t\t\t\n\t\t\t\t\t\tprint(\"Did not get any response from the server within 10 secs. Server might be down\")\t\t\t\t\n\t\t\texcept Exception as e:\n\t\t\t\tprint(\"Exception occured in send_msg: %s\" %str(e))\n\t\t\t\t#self.sock.close()\n\t\telse:\n\t\t\tprint(\"Can not send msg: The client is not connected to the server\")\n\t\n\tdef clear(self):\n\t\tprint(\"Clear: Client shutting down\")\n\t\tself.sock.close()\n\t\tself.connected = False\n\t\t\t\t\t\t\n'''\nparser = argparse.ArgumentParser(description = 'TCP Socket client')\nparser.add_argument('-t','--topic', action = \"store\", dest = \"topic\", required = True)\nparser.add_argument('-n', '--name', action = \"store\", dest = \"name\", required = True)\nparser.add_argument('-p', '--payload', action = \"store\", dest = \"payload\", required = True)\n\ngiven_args = parser.parse_args()\n'''\n\nargs = sys.stdin.readline()\ngiven_args = json.loads(args)\n\nmsg = {\n    \"topic\": \"\",\n    \"payload\":\"\",\n    \"name\":\"\"\n}\nport = {{payload}}\nname = 'Nodered_TCP_client'\nclient = TCPChatClient(name, port)\nclient.run()\n\t\n\t\n",
+        "output": "str",
+        "x": 470,
+        "y": 300,
+        "wires": [
+            [
+                "f805732f740ed0d8"
+            ]
+        ]
+    },
+    {
+        "id": "f805732f740ed0d8",
+        "type": "file",
+        "z": "242db1fb80847d43",
+        "name": "save tcp_client_file",
+        "filename": "/data/tcp_client_file.py",
+        "appendNewline": true,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 710,
+        "y": 300,
+        "wires": [
+            [
+                "ca5726b0be9b4765"
+            ]
+        ]
+    },
+    {
+        "id": "17d4773a0945e351",
+        "type": "pythonshell in",
+        "z": "242db1fb80847d43",
+        "name": "",
+        "pyfile": "/data/tcp_client_file.py",
+        "virtualenv": "/data/envtest",
+        "continuous": true,
+        "stdInData": true,
+        "x": 800,
+        "y": 680,
+        "wires": [
+            [
+                "ca5726b0be9b4765"
+            ]
+        ]
+    },
+    {
+        "id": "74cecf3c62f4a280",
+        "type": "inject",
+        "z": "242db1fb80847d43",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 240,
+        "y": 300,
+        "wires": [
+            [
+                "ec02ae3e775af67d"
+            ]
+        ]
+    },
+    {
+        "id": "dfd5fd77a7a53cc2",
+        "type": "inject",
+        "z": "242db1fb80847d43",
+        "name": "INVENTORY_START",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "ECCEL_READER,INVENTORY_START,0",
+        "payloadType": "str",
+        "x": 360,
+        "y": 740,
+        "wires": [
+            [
+                "6ab66be0a7d8ef6b"
+            ]
+        ]
+    },
+    {
+        "id": "6ab66be0a7d8ef6b",
+        "type": "function",
+        "z": "242db1fb80847d43",
+        "name": "",
+        "func": "var str = msg.payload\nvar tab = str.split(\",\");\nret = {\n    \"name\": tab[0],\n    \"topic\": tab[1],\n    \"payload\": tab[2],\n};\nmsg.payload = ret\nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 780,
+        "wires": [
+            [
+                "17d4773a0945e351"
+            ]
+        ]
+    },
+    {
+        "id": "89d97ce58ed1c918",
+        "type": "function",
+        "z": "242db1fb80847d43",
+        "name": "",
+        "func": "\nvar ret = {\n    \"name\": \"ECCEL_READER\",\n    \"topic\": \"SET_TAG_DATESTART\",\n    \"payload\": msg.payload,\n};\nmsg.payload = ret;\nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 620,
+        "wires": [
+            [
+                "17d4773a0945e351"
+            ]
+        ]
+    },
+    {
+        "id": "3716a4d4c7746b4d",
+        "type": "comment",
+        "z": "242db1fb80847d43",
+        "name": "Update agent 2",
+        "info": "",
+        "x": 600,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "cf2d13ab120dd556",
+        "type": "switch",
+        "z": "242db1fb80847d43",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 450,
+        "y": 620,
+        "wires": [
+            [
+                "89d97ce58ed1c918"
+            ]
+        ]
+    },
+    {
+        "id": "058ed885459d7595",
+        "type": "inject",
+        "z": "242db1fb80847d43",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "client_opcua_write_DateStart",
+        "payloadType": "global",
+        "x": 190,
+        "y": 620,
+        "wires": [
+            [
+                "cf2d13ab120dd556"
+            ]
+        ]
+    },
+    {
+        "id": "94955d48eba94fe3",
+        "type": "inject",
+        "z": "242db1fb80847d43",
+        "name": "READ_TAG_NAME",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "ECCEL_READER,GET_TAG_NAME,1",
+        "payloadType": "str",
+        "x": 350,
+        "y": 800,
+        "wires": [
+            [
+                "6ab66be0a7d8ef6b"
+            ]
+        ]
+    },
+    {
+        "id": "66bdb190f97453df",
+        "type": "inject",
+        "z": "242db1fb80847d43",
+        "name": "INVENTORY_NEXT",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "ECCEL_READER,INVENTORY_NEXT,0",
+        "payloadType": "str",
+        "x": 370,
+        "y": 840,
+        "wires": [
+            [
+                "6ab66be0a7d8ef6b"
+            ]
+        ]
+    },
+    {
+        "id": "d6f93a705048c1da",
+        "type": "inject",
+        "z": "242db1fb80847d43",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "client_opcua_write_Comments",
+        "payloadType": "global",
+        "x": 190,
+        "y": 580,
+        "wires": [
+            [
+                "32c32836324f7c29"
+            ]
+        ]
+    },
+    {
+        "id": "556b651018568d3d",
+        "type": "function",
+        "z": "242db1fb80847d43",
+        "name": "",
+        "func": "\nvar ret = {\n    \"name\": \"ECCEL_READER\",\n    \"topic\": \"SET_TAG_COMMENTS\",\n    \"payload\": msg.payload\n};\nmsg.payload = ret;\nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 580,
+        "wires": [
+            [
+                "17d4773a0945e351"
+            ]
+        ]
+    },
+    {
+        "id": "32c32836324f7c29",
+        "type": "switch",
+        "z": "242db1fb80847d43",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 450,
+        "y": 580,
+        "wires": [
+            [
+                "556b651018568d3d"
+            ]
+        ]
+    },
+    {
+        "id": "6df7fd59941e7900",
+        "type": "inject",
+        "z": "242db1fb80847d43",
+        "name": "WRITE_DateStart",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "ECCEL_READER,SET_TAG_DATESTART,29/10/22",
+        "payloadType": "str",
+        "x": 370,
+        "y": 880,
+        "wires": [
+            [
+                "6ab66be0a7d8ef6b"
+            ]
+        ]
+    },
+    {
+        "id": "5274252de5b5be32",
+        "type": "inject",
+        "z": "242db1fb80847d43",
+        "name": "READ_ALL",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "ECCEL_READER,READ_ALL,0",
+        "payloadType": "str",
+        "x": 390,
+        "y": 960,
+        "wires": [
+            [
+                "32b2653183111f8e"
+            ]
+        ]
+    },
+    {
+        "id": "32b2653183111f8e",
+        "type": "function",
+        "z": "242db1fb80847d43",
+        "name": "",
+        "func": "var str = \"ECCEL_READER,READ_ALL,0\";\nvar tab = str.split(\",\");\nglobal.set(\"name_list\",\"\");\nglobal.set(\"comments_list\",\"\");\nglobal.set(\"tag_ctr\",0);\nret = {\n    \"name\": tab[0],\n    \"topic\": tab[1],\n    \"payload\": tab[2],\n};\nmsg.payload = ret\nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 960,
+        "wires": [
+            [
+                "17d4773a0945e351"
+            ]
+        ]
+    },
+    {
+        "id": "86979058f647c4a6",
+        "type": "inject",
+        "z": "242db1fb80847d43",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "client_opcua_write_DateStop",
+        "payloadType": "global",
+        "x": 190,
+        "y": 540,
+        "wires": [
+            [
+                "416cbbcbe4ffa429"
+            ]
+        ]
+    },
+    {
+        "id": "6ee24752d0e6400e",
+        "type": "function",
+        "z": "242db1fb80847d43",
+        "name": "",
+        "func": "\nvar ret = {\n    \"name\": \"ECCEL_READER\",\n    \"topic\": \"SET_TAG_DATESTOP\",\n    \"payload\": msg.payload\n};\nmsg.payload = ret;\nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 540,
+        "wires": [
+            [
+                "17d4773a0945e351"
+            ]
+        ]
+    },
+    {
+        "id": "416cbbcbe4ffa429",
+        "type": "switch",
+        "z": "242db1fb80847d43",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 450,
+        "y": 540,
+        "wires": [
+            [
+                "6ee24752d0e6400e"
+            ]
+        ]
+    },
+    {
+        "id": "95720b79e2308f3b",
+        "type": "inject",
+        "z": "242db1fb80847d43",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "client_opcua_write_ExpNbr",
+        "payloadType": "global",
+        "x": 200,
+        "y": 500,
+        "wires": [
+            [
+                "8d9b514a18ba7810"
+            ]
+        ]
+    },
+    {
+        "id": "78d4d4be986bd5eb",
+        "type": "function",
+        "z": "242db1fb80847d43",
+        "name": "",
+        "func": "\nvar ret = {\n    \"name\": \"ECCEL_READER\",\n    \"topic\": \"SET_TAG_EXPNBR\",\n    \"payload\": msg.payload\n};\nmsg.payload = ret;\nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 500,
+        "wires": [
+            [
+                "17d4773a0945e351"
+            ]
+        ]
+    },
+    {
+        "id": "8d9b514a18ba7810",
+        "type": "switch",
+        "z": "242db1fb80847d43",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 450,
+        "y": 500,
+        "wires": [
+            [
+                "78d4d4be986bd5eb"
+            ]
+        ]
+    },
+    {
+        "id": "7c1ba48c5372a282",
+        "type": "inject",
+        "z": "242db1fb80847d43",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "client_opcua_write_Name",
+        "payloadType": "global",
+        "x": 200,
+        "y": 460,
+        "wires": [
+            [
+                "e4e53b0270348400"
+            ]
+        ]
+    },
+    {
+        "id": "f94cc6b4668b5268",
+        "type": "function",
+        "z": "242db1fb80847d43",
+        "name": "",
+        "func": "\nvar ret = {\n    \"name\": \"ECCEL_READER\",\n    \"topic\": \"SET_TAG_NAME\",\n    \"payload\": msg.payload\n};\nmsg.payload = ret;\nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 460,
+        "wires": [
+            [
+                "17d4773a0945e351"
+            ]
+        ]
+    },
+    {
+        "id": "e4e53b0270348400",
+        "type": "switch",
+        "z": "242db1fb80847d43",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 450,
+        "y": 460,
+        "wires": [
+            [
+                "f94cc6b4668b5268"
+            ]
+        ]
+    },
+    {
+        "id": "bd5ba3a92f748856",
+        "type": "inject",
+        "z": "242db1fb80847d43",
+        "name": "READ_TAG_EXPNBR",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "ECCEL_READER,GET_TAG_EXPNBR,1",
+        "payloadType": "str",
+        "x": 380,
+        "y": 920,
+        "wires": [
+            [
+                "6ab66be0a7d8ef6b"
+            ]
+        ]
+    },
+    {
+        "id": "8213debaedb93bde",
+        "type": "opcua-compact-server",
+        "z": "bbf865cfacf0c623",
+        "port": "4840",
+        "endpoint": "",
+        "productUri": "",
+        "acceptExternalCommands": true,
+        "maxAllowedSessionNumber": "10",
+        "maxConnectionsPerEndpoint": "10",
+        "maxAllowedSubscriptionNumber": 100,
+        "alternateHostname": "",
+        "name": "",
+        "showStatusActivities": true,
+        "showErrors": true,
+        "allowAnonymous": true,
+        "individualCerts": false,
+        "isAuditing": true,
+        "serverDiscovery": true,
+        "users": [],
+        "xmlsetsOPCUA": [],
+        "publicCertificateFile": "",
+        "privateCertificateFile": "",
+        "registerServerMethod": "1",
+        "discoveryServerEndpointUrl": "opc.tcp://172.17.0.1:4840",
+        "capabilitiesForMDNS": "",
+        "maxNodesPerRead": 1000,
+        "maxNodesPerWrite": 1000,
+        "maxNodesPerHistoryReadData": 100,
+        "maxNodesPerBrowse": 3000,
+        "maxBrowseContinuationPoints": 10,
+        "maxHistoryContinuationPoints": 10,
+        "delayToInit": 1000,
+        "delayToClose": 200,
+        "serverShutdownTimeout": 100,
+        "addressSpaceScript": "function constructAlarmAddressSpace(server, addressSpace, eventObjects, done) {\n  // server = the created node-opcua server\n  // addressSpace = address space of the node-opcua server\n  // eventObjects = add event variables here to hold them in memory from this script\n\n  // internal sandbox objects are:\n  // node = the compact server node,\n  // coreServer = core compact server object for debug and access to NodeOPCUA\n  // this.sandboxNodeContext = node context node-red\n  // this.sandboxFlowContext = flow context node-red\n  // this.sandboxGlobalContext = global context node-red\n  // this.sandboxEnv = env variables\n  // timeout and interval functions as expected from nodejs\n\n  const opcua = coreServer.choreCompact.opcua;\n  const rootFolder = addressSpace.findNode(\"RootFolder\");\n  const namespace = addressSpace.getOwnNamespace();\n\n  // your code here\n    \n    const Variant = opcua.Variant;\n    const DataType = opcua.DataType;\n    const DataValue = opcua.DataValue;\n    const DATE_LENGTH = 5;\n    \n  //Global variables to track the nbr of tags that have been so for detected\n  this.sandboxGlobalContext.set(\"tag_ctr\", 0);\n  this.sandboxGlobalContext.set(\"new_tag\", 0);\n  this.sandboxGlobalContext.set(\"tag_ExpNbr\", 0);\n  this.sandboxGlobalContext.set(\"tag_DateStart\", \"\");\n  this.sandboxGlobalContext.set(\"tag_DateStop\", \"\");\n  this.sandboxGlobalContext.set(\"tag_UUID\", \"\");\n  this.sandboxGlobalContext.set(\"tag_Comments\", \"\");\n  this.sandboxGlobalContext.set(\"tag_infos\",\"\");\n  this.sandboxGlobalContext.set(\"Cmd2send\", \"\");\n  this.sandboxGlobalContext.set(\"tag_Name\", \"\");\n  this.sandboxGlobalContext.set(\"client_opcua_write_Name\", \"\");\n  this.sandboxGlobalContext.set(\"client_opcua_write_DateStart\", \"\");\n  this.sandboxGlobalContext.set(\"client_opcua_write_DateStop\", \"\");\n  this.sandboxGlobalContext.set(\"client_opcua_write_Comments\", \"\");\n  this.sandboxGlobalContext.set(\"client_opcua_write_ExpNbr\", \"\");\n  this.sandboxGlobalContext.set(\"rfid_reader_BLE_state\", \"NOT_CONNECTED\");\n  this.sandboxGlobalContext.set(\"rfid_reader_status\", \"\");\n  \n  // create a rootfolder to start our datastructure\n  //coreServer.internalDebugLog(\"Initializing dynamic address space\");\n  \n  node.warn(\"Building new adress space for OPCUA Server\");\n  const demoStation = namespace.addFolder(rootFolder.objects, {\"browseName\":\"demoStation\"});\n  const tags = namespace.addFolder(demoStation, {\"browseName\": \"tags\"});\n  const tags_ctr = namespace.addFolder(demoStation, {\"browseName\": \"tags_ctr\"});\n  const tag_0 = namespace.addFolder(tags, {\"browseName\": \"tag_0\"});\n  const rfid_reader = namespace.addFolder(demoStation, {\"browseName\": \"rfid_reader\"});\n  const compactServerInternals = this;\n  const get_tag_infos = function(){\n      const to_send = compactServerInternals.sandboxGlobalContext.get(\"tag_ExpNbr\").toString() + ',' +\n            compactServerInternals.sandboxGlobalContext.get(\"tag_Name\") + ',' +\n            compactServerInternals.sandboxGlobalContext.get(\"tag_UUID\") + ',' +\n            compactServerInternals.sandboxGlobalContext.get(\"tag_DateStart\") + ',' +\n            compactServerInternals.sandboxGlobalContext.get(\"tag_DateStop\") + ',' +\n            compactServerInternals.sandboxGlobalContext.get(\"tag_Comments\");\n      compactServerInternals.sandboxGlobalContext.set(\"tag_infos\", to_send);     \n      return to_send;\n  }\n  const counter = namespace.addVariable({\n      \"organizedBy\": tags_ctr,\n      \"browseName\": \"counter\",\n      \"nodeId\": \"ns=1;s=\\\"tags_ctr\\\".counter\",\n      \"dataType\": \"Int32\",\n      \"value\": {\n          \"get\":function(){\n          return new Variant({\n              \"dataType\":DataType.Int32,\n              \"value\": compactServerInternals.sandboxGlobalContext.get(\"tag_ctr\")\n          });\n          }\n      }\n      });\n      \n  const infos = namespace.addVariable({\n      \"organizedBy\": tag_0,\n      \"browseName\": \"infos\",\n      \"nodeId\": \"ns=1;s=\\\"tags\\\".\\\"tag_0\\\".infos\",\n      \"dataType\": \"String\",\n       \"value\": {\n          \"get\":function(){\n          return new Variant({\n              \"dataType\":DataType.String,\n              \"value\": get_tag_infos()\n          });\n          }\n      }\n     \n  });\n  \n   const new_tag = namespace.addVariable({\n      \"organizedBy\": tag_0,\n      \"browseName\": \"new_tag\",\n      \"nodeId\": \"ns=1;s=\\\"tags\\\".\\\"tag_0\\\".new_tag\",\n      \"dataType\": \"Int32\",\n       \"value\": {\n          \"get\":function(){\n          return new Variant({\n              \"dataType\":DataType.Int32,\n              \"value\": compactServerInternals.sandboxGlobalContext.get(\"new_tag\")\n          });\n          },\n          \"set\": function(variant){\n              compactServerInternals.sandboxGlobalContext.set(\"new_tag\", parseInt(variant.value));\n              return opcua.StatusCodes.Good;\n          }\n      }\n     \n  });\n  \n  const tag_Name = namespace.addVariable({\n      \"organizedBy\": tag_0,\n      \"browseName\": \"tag_Name\",\n      \"nodeId\": \"ns=1;s=\\\"tags\\\".\\\"tag_0\\\".tag_Name\",\n      \"dataType\": \"String\",\n       \"value\": {\n          \"get\":function(){\n          return new Variant({\n              \"dataType\":DataType.String,\n              \"value\": compactServerInternals.sandboxGlobalContext.get(\"tag_Name\")\n          });\n          },\n          \"set\": function(variant){\n              compactServerInternals.sandboxGlobalContext.set(\"client_opcua_write_Name\", variant.value.toString());\n              return opcua.StatusCodes.Good;\n          }\n      }\n     \n  });\n  \n \n  const tag_UUID = namespace.addVariable({\n      \"organizedBy\": tag_0,\n      \"browseName\": \"tag_UUID\",\n      \"nodeId\": \"ns=1;s=\\\"tags\\\".\\\"tag_0\\\".tag_UUID\",\n      \"dataType\": \"String\",\n       \"value\": {\n          \"get\":function(){\n          return new Variant({\n              \"dataType\":DataType.String,\n              \"value\": compactServerInternals.sandboxGlobalContext.get(\"tag_UUID\")\n          });\n          }\n      }\n     \n  });\n  \n  const tag_DateStart = namespace.addVariable({\n      \"organizedBy\": tag_0,\n      \"browseName\": \"tag_DateStart\",\n      \"nodeId\": \"ns=1;s=\\\"tags\\\".\\\"tag_0\\\".tag_DateStart\",\n      \"dataType\": \"String\",\n       \"value\": {\n          \"get\":function(){\n          return new Variant({\n              \"dataType\":DataType.String,\n              \"value\": compactServerInternals.sandboxGlobalContext.get(\"tag_DateStart\")\n          });\n          },\n          \"set\": function(variant){\n              let bad = 1;\n              let temp_list = variant.value.toString().split(\"/\")\n              if(temp_list.length >= DATE_LENGTH){\n                bad = 0;\n                for(let j = 0; j<DATE_LENGTH;j++){\n                    let char = temp_list[j].split('');\n                    for(let k = 0; k< char.length;k++){\n                        if(isNaN(char[k])){\n                            bad = 1;\n                            break;\n                        }\n                     }\n                    \n                      if(bad == 1){\n                          break;\n                      }\n                }\n                  \n              }\n              if(bad == 0){\n                  compactServerInternals.sandboxGlobalContext.set(\"client_opcua_write_DateStart\", variant.value.toString() );\n              }\n              else{\n                  compactServerInternals.sandboxGlobalContext.set(\"tag_DateStart\", \"BAD_FORMAT\");\n              }\n              return opcua.StatusCodes.Good;\n          }\n      }\n     \n  });\n  \n  const tag_DateStop = namespace.addVariable({\n      \"organizedBy\": tag_0,\n      \"browseName\": \"tag_DateStop\",\n      \"nodeId\": \"ns=1;s=\\\"tags\\\".\\\"tag_0\\\".tag_DateStop\",\n      \"dataType\": \"String\",\n       \"value\": {\n          \"get\":function(){\n          return new Variant({\n              \"dataType\":DataType.String,\n              \"value\": compactServerInternals.sandboxGlobalContext.get(\"tag_DateStop\")\n          });\n          },\n          \"set\": function(variant){\n              let bad = 1;\n              let temp_list = variant.value.toString().split(\"/\")\n              if(temp_list.length >= DATE_LENGTH){\n                bad = 0;\n                for(let j = 0; j<DATE_LENGTH;j++){\n                    let char = temp_list[j].split('');\n                    for(let k = 0; k< char.length;k++){\n                        if(isNaN(char[k])){\n                            bad = 1;\n                            break;\n                        }\n                     }\n                    \n                      if(bad == 1){\n                          break;\n                      }\n                }\n                  \n              }\n              if(bad == 0){\n                  compactServerInternals.sandboxGlobalContext.set(\"client_opcua_write_DateStop\", variant.value.toString() );\n              }\n              else{\n                  compactServerInternals.sandboxGlobalContext.set(\"tag_DateStop\", \"BAD_FORMAT\");\n              }\n              return opcua.StatusCodes.Good;\n          }\n      }\n     \n  });\n  \n  \n  const tag_Comments = namespace.addVariable({\n      \"organizedBy\": tag_0,\n      \"browseName\": \"tag_Comments\",\n      \"nodeId\": \"ns=1;s=\\\"tags\\\".\\\"tag_0\\\".tag_Comments\",\n      \"dataType\": \"String\",\n       \"value\": {\n          \"get\":function(){\n          return new Variant({\n              \"dataType\":DataType.String,\n              \"value\": compactServerInternals.sandboxGlobalContext.get(\"tag_Comments\")\n          });\n          },\n          \"set\": function(variant){\n              compactServerInternals.sandboxGlobalContext.set(\"client_opcua_write_Comments\",variant.value.toString());\n              return opcua.StatusCodes.Good;\n          }\n      }\n     \n  });\n  \n  const tag_ExpNbr = namespace.addVariable({\n      \"organizedBy\": tag_0,\n      \"browseName\": \"tag_ExpNbr\",\n      \"nodeId\": \"ns=1;s=\\\"tags\\\".\\\"tag_0\\\".tag_ExpNbr\",\n      \"dataType\": \"Int32\",\n       \"value\": {\n          \"get\":function(){\n          return new Variant({\n              \"dataType\":DataType.Int32,\n              \"value\": compactServerInternals.sandboxGlobalContext.get(\"tag_ExpNbr\")\n          });\n          },\n          \"set\": function(variant){\n              compactServerInternals.sandboxGlobalContext.set(\"client_opcua_write_ExpNbr\", parseInt(variant.value));\n              return opcua.StatusCodes.Good;\n          }\n      }\n     \n  });\n    \n    const status = namespace.addVariable({\n      \"organizedBy\": rfid_reader,\n      \"browseName\": \"status\",\n      \"nodeId\": \"ns=1;s=\\\"rfid_reader\\\".status\",\n      \"dataType\": \"String\",\n       \"value\": {\n          \"get\":function(){\n          return new Variant({\n              \"dataType\":DataType.String,\n              \"value\": compactServerInternals.sandboxGlobalContext.get(\"rfid_reader_status\")\n          });\n          }\n      }\n     \n  });\n  \n    const BLE_state = namespace.addVariable({\n      \"organizedBy\": rfid_reader,\n      \"browseName\": \"BLE_state\",\n      \"nodeId\": \"ns=1;s=\\\"rfid_reader\\\".BLE_state\",\n      \"dataType\": \"String\",\n       \"value\": {\n          \"get\":function(){\n          return new Variant({\n              \"dataType\":DataType.String,\n              \"value\": compactServerInternals.sandboxGlobalContext.get(\"rfid_reader_BLE_state\")\n          });\n          }\n      }\n     \n  });\n  \n    //coreserver.internalDebugLog(\"Dynamic space has been successfully created\");\n    node.warn(\"Dynamic space has been successfully created\");\n    \n    //namespace.deleteNode(counter);\n    \n    \n  done();\n}\n",
+        "x": 700,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "2da00b2436ab4fe6",
+        "type": "inject",
+        "z": "bbf865cfacf0c623",
+        "name": "browse server",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1",
+        "payload": "",
+        "payloadType": "date",
+        "x": 230,
+        "y": 280,
+        "wires": [
+            [
+                "6e35b3ca256aeab5"
+            ]
+        ]
+    },
+    {
+        "id": "b5c24e6b688741a6",
+        "type": "OpcUa-Client",
+        "z": "bbf865cfacf0c623",
+        "endpoint": "5dde3cf4d0017d37",
+        "action": "browse",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": "1",
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "name": "Browse client",
+        "x": 670,
+        "y": 280,
+        "wires": [
+            [
+                "cdb74068d34e8df6"
+            ]
+        ]
+    },
+    {
+        "id": "cdb74068d34e8df6",
+        "type": "debug",
+        "z": "bbf865cfacf0c623",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": true,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 1010,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "b27d021d8b13d09b",
+        "type": "inject",
+        "z": "bbf865cfacf0c623",
+        "name": "subscribe to tag_infos",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=\"tags\".\"tag_0\".infos",
+        "x": 360,
+        "y": 380,
+        "wires": [
+            [
+                "e7612b4ab82ba95e"
+            ]
+        ]
+    },
+    {
+        "id": "a3261f4bdab13104",
+        "type": "inject",
+        "z": "bbf865cfacf0c623",
+        "name": "subscribe to new_tag",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=\"tags\".\"tag_0\".new_tag",
+        "x": 360,
+        "y": 520,
+        "wires": [
+            [
+                "e7612b4ab82ba95e"
+            ]
+        ]
+    },
+    {
+        "id": "fe02e42d8febabf8",
+        "type": "inject",
+        "z": "bbf865cfacf0c623",
+        "name": "write new_tag",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "25",
+        "payloadType": "num",
+        "x": 250,
+        "y": 820,
+        "wires": [
+            [
+                "34d3d19dfbd03594"
+            ]
+        ]
+    },
+    {
+        "id": "34d3d19dfbd03594",
+        "type": "OpcUa-Item",
+        "z": "bbf865cfacf0c623",
+        "item": "ns=1;s=\"tags\".\"tag_0\".new_tag",
+        "datatype": "Int32",
+        "value": "",
+        "name": "new_tag",
+        "x": 480,
+        "y": 820,
+        "wires": [
+            [
+                "d90aca9f4eba93b0"
+            ]
+        ]
+    },
+    {
+        "id": "57afad16499e39f2",
+        "type": "inject",
+        "z": "bbf865cfacf0c623",
+        "name": "subscribe to tag_UUID",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=\"tags\".\"tag_0\".tag_UUID",
+        "x": 360,
+        "y": 440,
+        "wires": [
+            [
+                "e7612b4ab82ba95e"
+            ]
+        ]
+    },
+    {
+        "id": "e7612b4ab82ba95e",
+        "type": "OpcUa-Client",
+        "z": "bbf865cfacf0c623",
+        "endpoint": "5dde3cf4d0017d37",
+        "action": "subscribe",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": "1",
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "name": "Subscribe client",
+        "x": 640,
+        "y": 520,
+        "wires": [
+            [
+                "cdb74068d34e8df6"
+            ]
+        ]
+    },
+    {
+        "id": "54363dfa624bd286",
+        "type": "inject",
+        "z": "bbf865cfacf0c623",
+        "name": "subscribe to tag_DateStart",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=\"tags\".\"tag_0\".tag_DateStart",
+        "x": 350,
+        "y": 480,
+        "wires": [
+            [
+                "e7612b4ab82ba95e"
+            ]
+        ]
+    },
+    {
+        "id": "29305fdc2ae95747",
+        "type": "inject",
+        "z": "bbf865cfacf0c623",
+        "name": "write tag_DateStart",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "01/07/22/12/20",
+        "payloadType": "str",
+        "x": 230,
+        "y": 880,
+        "wires": [
+            [
+                "9af0ca7fda2aee7a"
+            ]
+        ]
+    },
+    {
+        "id": "d90aca9f4eba93b0",
+        "type": "OpcUa-Client",
+        "z": "bbf865cfacf0c623",
+        "endpoint": "5dde3cf4d0017d37",
+        "action": "write",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": "1",
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "name": "Write client",
+        "x": 710,
+        "y": 960,
+        "wires": [
+            [
+                "e633533805bbf621"
+            ]
+        ]
+    },
+    {
+        "id": "9af0ca7fda2aee7a",
+        "type": "OpcUa-Item",
+        "z": "bbf865cfacf0c623",
+        "item": "ns=1;s=\"tags\".\"tag_0\".tag_DateStart",
+        "datatype": "String",
+        "value": "",
+        "name": "tag_DateStart",
+        "x": 460,
+        "y": 880,
+        "wires": [
+            [
+                "d90aca9f4eba93b0"
+            ]
+        ]
+    },
+    {
+        "id": "b0e52724b59f9bda",
+        "type": "inject",
+        "z": "bbf865cfacf0c623",
+        "name": "subscribe to tag_DateStop",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=\"tags\".\"tag_0\".tag_DateStop",
+        "x": 350,
+        "y": 560,
+        "wires": [
+            [
+                "e7612b4ab82ba95e"
+            ]
+        ]
+    },
+    {
+        "id": "b8b20958f4612b21",
+        "type": "inject",
+        "z": "bbf865cfacf0c623",
+        "name": "write tag_DateStop",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=\"tags\".\"tag_0\".tag_DateStop",
+        "payload": "30/07/22/12/41",
+        "payloadType": "str",
+        "x": 230,
+        "y": 940,
+        "wires": [
+            [
+                "d5379582d465f5d1"
+            ]
+        ]
+    },
+    {
+        "id": "d5379582d465f5d1",
+        "type": "OpcUa-Item",
+        "z": "bbf865cfacf0c623",
+        "item": "ns=1;s=\"tags\".\"tag_0\".tag_DateStop",
+        "datatype": "String",
+        "value": "",
+        "name": "tag_DateStop",
+        "x": 460,
+        "y": 940,
+        "wires": [
+            [
+                "d90aca9f4eba93b0"
+            ]
+        ]
+    },
+    {
+        "id": "c9325938fe111a9d",
+        "type": "inject",
+        "z": "bbf865cfacf0c623",
+        "name": "subscribe to tag_Comments",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=\"tags\".\"tag_0\".tag_Comments",
+        "x": 340,
+        "y": 600,
+        "wires": [
+            [
+                "e7612b4ab82ba95e"
+            ]
+        ]
+    },
+    {
+        "id": "b6be43550851d706",
+        "type": "inject",
+        "z": "bbf865cfacf0c623",
+        "name": "write tag_Comments",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=\"tags\".\"tag_0\".tag_Comments",
+        "payload": "we are about to start",
+        "payloadType": "str",
+        "x": 230,
+        "y": 1000,
+        "wires": [
+            [
+                "9acbbe8baf96136f"
+            ]
+        ]
+    },
+    {
+        "id": "9acbbe8baf96136f",
+        "type": "OpcUa-Item",
+        "z": "bbf865cfacf0c623",
+        "item": "ns=1;s=\"tags\".\"tag_0\".tag_Comments",
+        "datatype": "String",
+        "value": "",
+        "name": "tag_Comments",
+        "x": 460,
+        "y": 1000,
+        "wires": [
+            [
+                "d90aca9f4eba93b0"
+            ]
+        ]
+    },
+    {
+        "id": "64994f2e8a83a13b",
+        "type": "inject",
+        "z": "bbf865cfacf0c623",
+        "name": "subscribe to tag_ExpNbr",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=\"tags\".\"tag_0\".tag_ExpNbr",
+        "x": 350,
+        "y": 640,
+        "wires": [
+            [
+                "e7612b4ab82ba95e"
+            ]
+        ]
+    },
+    {
+        "id": "1b60ee0e49c082a1",
+        "type": "inject",
+        "z": "bbf865cfacf0c623",
+        "name": "write tag_ExpNbr",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=\"tags\".\"tag_0\".tag_ExpNbr",
+        "payload": "45",
+        "payloadType": "num",
+        "x": 240,
+        "y": 1060,
+        "wires": [
+            [
+                "a6426489bcc50e4a"
+            ]
+        ]
+    },
+    {
+        "id": "a6426489bcc50e4a",
+        "type": "OpcUa-Item",
+        "z": "bbf865cfacf0c623",
+        "item": "ns=1;s=\"tags\".\"tag_0\".tag_ExpNbr",
+        "datatype": "Int32",
+        "value": "",
+        "name": "tag_ExpNbr",
+        "x": 470,
+        "y": 1060,
+        "wires": [
+            [
+                "d90aca9f4eba93b0"
+            ]
+        ]
+    },
+    {
+        "id": "e633533805bbf621",
+        "type": "debug",
+        "z": "bbf865cfacf0c623",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 930,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "6e35b3ca256aeab5",
+        "type": "OpcUa-Item",
+        "z": "bbf865cfacf0c623",
+        "item": "ns=1;s=\"tags\".\"tag_0\"",
+        "datatype": "Extension Object",
+        "value": "",
+        "name": "Browse item",
+        "x": 490,
+        "y": 280,
+        "wires": [
+            [
+                "b5c24e6b688741a6"
+            ]
+        ]
+    },
+    {
+        "id": "85036491051d9482",
+        "type": "inject",
+        "z": "bbf865cfacf0c623",
+        "name": "subscribe to tag_Name",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=\"tags\".\"tag_0\".tag_Name",
+        "x": 360,
+        "y": 680,
+        "wires": [
+            [
+                "e7612b4ab82ba95e"
+            ]
+        ]
+    },
+    {
+        "id": "00ebe6668d690f38",
+        "type": "inject",
+        "z": "bbf865cfacf0c623",
+        "name": "Read tag_Name",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=\"tags\".\"tag_0\".Name",
+        "x": 220,
+        "y": 1200,
+        "wires": [
+            [
+                "a50be95c71e5e8d0"
+            ]
+        ]
+    },
+    {
+        "id": "595b83da4d915103",
+        "type": "OpcUa-Item",
+        "z": "bbf865cfacf0c623",
+        "item": "ns=1;s=\"tags\".\"tag_0\".tag_Name",
+        "datatype": "String",
+        "value": "",
+        "name": "tag_Name",
+        "x": 470,
+        "y": 1100,
+        "wires": [
+            [
+                "d90aca9f4eba93b0"
+            ]
+        ]
+    },
+    {
+        "id": "e87bb0c7fea0d5a3",
+        "type": "OpcUa-Client",
+        "z": "bbf865cfacf0c623",
+        "endpoint": "5dde3cf4d0017d37",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": "1",
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "name": "Read client",
+        "x": 710,
+        "y": 1260,
+        "wires": [
+            [
+                "6ef993ef57ddb495"
+            ]
+        ]
+    },
+    {
+        "id": "ed477c9e6787e6fd",
+        "type": "inject",
+        "z": "bbf865cfacf0c623",
+        "name": "Read tag_DateStop",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=\"tags\".\"tag_0\".tag_DateStop",
+        "payload": "25",
+        "payloadType": "num",
+        "x": 230,
+        "y": 1240,
+        "wires": [
+            [
+                "e70cee29f9dd1a0e"
+            ]
+        ]
+    },
+    {
+        "id": "e70cee29f9dd1a0e",
+        "type": "OpcUa-Item",
+        "z": "bbf865cfacf0c623",
+        "item": "ns=1;s=\"tags\".\"tag_0\".tag_DateStop",
+        "datatype": "String",
+        "value": "",
+        "name": "tag_DateStop",
+        "x": 460,
+        "y": 1240,
+        "wires": [
+            [
+                "e87bb0c7fea0d5a3"
+            ]
+        ]
+    },
+    {
+        "id": "b46699b0b557236b",
+        "type": "inject",
+        "z": "bbf865cfacf0c623",
+        "name": "read tag_DateStart",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "20/02/22",
+        "payloadType": "str",
+        "x": 230,
+        "y": 1300,
+        "wires": [
+            [
+                "c0918eacb3d950c7"
+            ]
+        ]
+    },
+    {
+        "id": "c0918eacb3d950c7",
+        "type": "OpcUa-Item",
+        "z": "bbf865cfacf0c623",
+        "item": "ns=1;s=\"tags\".\"tag_0\".tag_DateStart",
+        "datatype": "String",
+        "value": "",
+        "name": "tag_DateStart",
+        "x": 460,
+        "y": 1300,
+        "wires": [
+            [
+                "e87bb0c7fea0d5a3"
+            ]
+        ]
+    },
+    {
+        "id": "6ef993ef57ddb495",
+        "type": "debug",
+        "z": "bbf865cfacf0c623",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 910,
+        "y": 1260,
+        "wires": []
+    },
+    {
+        "id": "a50be95c71e5e8d0",
+        "type": "OpcUa-Item",
+        "z": "bbf865cfacf0c623",
+        "item": "ns=1;s=\"tags\".\"tag_0\".tag_Name",
+        "datatype": "String",
+        "value": "",
+        "name": "tag_Name",
+        "x": 470,
+        "y": 1200,
+        "wires": [
+            [
+                "e87bb0c7fea0d5a3"
+            ]
+        ]
+    },
+    {
+        "id": "7fbd2db54ba21780",
+        "type": "inject",
+        "z": "bbf865cfacf0c623",
+        "name": "Write tag_Name",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "ns=1;s=\"tags\".\"tag_0\".Name",
+        "payload": "Nano1",
+        "payloadType": "str",
+        "x": 240,
+        "y": 1100,
+        "wires": [
+            [
+                "595b83da4d915103"
+            ]
+        ]
+    },
+    {
+        "id": "8aa1753059061b2d",
+        "type": "tcp in",
+        "z": "c4b025abd5ce7129",
+        "name": "",
+        "server": "server",
+        "host": "localhost",
+        "port": "3340",
+        "datamode": "stream",
+        "datatype": "buffer",
+        "newline": ".",
+        "topic": "",
+        "base64": false,
+        "x": 350,
+        "y": 160,
+        "wires": [
+            [
+                "5aea031ced2ebd02"
+            ]
+        ]
+    },
+    {
+        "id": "5aea031ced2ebd02",
+        "type": "function",
+        "z": "c4b025abd5ce7129",
+        "name": "",
+        "func": "var data = msg.payload;\nvar data_len = 0;\nvar buf = [];\nif(parseInt(data[0]) == 128){\n    data_len = parseInt(data[12])\n    buf = data.slice(13, 13 + data_len);\n}\nif(parseInt(data[0]) == 0){\n    data_len = parseInt(data[16])\n    buf = data.slice(17, 17 + data_len);\n}\n\nif(data_len == 0){\n    return msg;\n}\n\nvar ret = String.fromCharCode.apply(null, buf);\nnode.warn(\"data used: \" + buf);\n/*\nvar hex2string = function(global_name_hex_list, global_name){\n    \n        var name_list = global.get( global_name_hex_list).split(\" \");\n        var tag_name =\"\";\n        var char = 0;\n        for(let j = 0; j<name_list.length; j++){\n            char = parseInt(name_list[j],16);\n            if(char == 0){\n                break;\n            }\n            tag_name += String.fromCharCode(char);\n        }\n        global.set( global_name,tag_name);\n        global.set(global_name_name_list,\"\");\n        \n}\n*/\nvar initialize_fields = function(){\n    \n      global.set(\"tag_ctr\", 0);\n      global.set(\"new_tag\", 0);\n      global.set(\"tag_ExpNbr\", 0);\n      global.set(\"tag_DateStart\", \"\");\n      global.set(\"tag_DateStop\", \"\");\n      global.set(\"tag_UUID\", \"\");\n      global.set(\"tag_Comments\", \"\");\n      global.set(\"tag_infos\",\"\");\n      global.set(\"Cmd2send\", \"\");\n      global.set(\"tag_Name\", \"\");\n      global.set(\"client_opcua_write_Name\", \"\");\n      global.set(\"client_opcua_write_DateStart\", \"\");\n      global.set(\"client_opcua_write_DateStop\", \"\");\n      global.set(\"client_opcua_write_Comments\", \"\");\n      global.set(\"client_opcua_write_ExpNbr\", \"\");\n}\nl = ret.split(\",\");\ncmd = l[0];\n\nif (cmd == \"ERR\" ){\n    if(global.get(\"rfid_reader_status\") != l[1]){\n        \n        if (l[1] == \"TAG_INVENTORY_START\" || l[1] == \"TAG_INVENTORY_NEXT\"){\n            initialize_fields();\n        }\n        global.set(\"rfid_reader_status\",l[1] + \" failed\");\n    }\n}\n\nif (cmd == \"ERR_LO\" ){\n    if(global.get(\"rfid_reader_status\") != l[1]){\n      global.set(\"rfid_reader_status\", l[1]);\n      initialize_fields();\n    }\n}\nif (cmd == \"CONNEXION\" ){\n    if(global.get(\"BLE_state\") != l[1]){\n        if(l[1] == \"FAILED\"){\n            global.set(\"rfid_reader_BLE_state\",\"DISCONNECTED\");\n        }\n        else{\n            global.set(\"rfid_reader_BLE_state\",\"CONNECTED\");\n        }\n        \n    }\n}\n\nif (cmd == \"GET_TAG_INFOS\" ){\n    if(global.get(\"tag_UUID\") != l[3]){\n        global.set(\"tag_UUID\",l[3]);\n        global.set(\"tag_ctr\",1);\n    }\n}\n\nif (cmd == \"TAG_INVENTORY_START\" || cmd == \"TAG_INVENTORY_NEXT\"){\n    global.set(\"rfid_reader_status\",\"\");\n    global.set(\"tag_UUID\",l[3]);\n}\nif (cmd == \"ICODE_READ_BLOCK\"){\n    global.set(\"tag_DateStart\",l[1]);\n}\n\nif (cmd == \"SET_TAG_NAME\"){\n    if (l[1] == \"ACK\"){\n        if(global.get(\"client_opcua_write_Name\") != \"\"){\n            global.set(\"tag_Name\",global.get(\"client_opcua_write_Name\"));\n            global.set(\"client_opcua_write_Name\",\"\");\n        }\n    }\n        \n}\nif (cmd == \"GET_TAG_NAME\"){\n        global.set(\"tag_Name\",l[1]);\n}\n\n\nif (cmd == \"SET_TAG_DATESTART\"){\n    if (l[1] == \"ACK\"){\n        if(global.get(\"client_opcua_write_DateStart\") != \"\"){\n            let temp_list = global.get(\"client_opcua_write_DateStart\").split(\"/\")\n            let temp = temp_list[0] + '/' + temp_list[1] + '/' +temp_list[2] + ' | ' + temp_list[3] + ':' +temp_list[4];\n            global.set(\"tag_DateStart\",temp);\n            global.set(\"client_opcua_write_DateStart\",\"\");\n        }\n    }\n}\nif (cmd == \"GET_TAG_DATESTART\"){\n        global.set(\"tag_DateStart\",l[1]);\n}\n\n\nif (cmd == \"SET_TAG_DATESTOP\"){\n    if (l[1] == \"ACK\"){\n        if(global.get(\"client_opcua_write_DateStop\") != \"\"){\n            let temp_list = global.get(\"client_opcua_write_DateStop\").split(\"/\");\n            let temp = temp_list[0] + '/' + temp_list[1] + '/' +temp_list[2] + ' | ' + temp_list[3] + ':' +temp_list[4];\n            global.set(\"tag_DateStop\",temp);\n            global.set(\"client_opcua_write_DateStop\",\"\");\n        }\n    }\n}\nif (cmd == \"GET_TAG_DATESTOP\"){\n        global.set(\"tag_DateStop\",l[1]);\n}\n\nif (cmd == \"SET_TAG_COMMENTS\"){\n    if (l[1] == \"ACK\"){\n        if(global.get(\"client_opcua_write_Comments\") != \"\"){\n            global.set(\"tag_Comments\",global.get(\"client_opcua_write_Comments\"));\n            global.set(\"client_opcua_write_Comments\",\"\");\n        }\n    }\n        \n}\nif (cmd == \"GET_TAG_COMMENTS\"){\n        global.set(\"tag_Comments\", l[1]);\n}\n\n\nif (cmd == \"SET_TAG_EXPNBR\"){\n    if (l[1] == \"ACK\"){\n        if(global.get(\"client_opcua_write_ExpNbr\") != \"\"){\n            global.set(\"tag_ExpNbr\",global.get(\"client_opcua_write_ExpNbr\"));\n            global.set(\"client_opcua_write_ExpNbr\",\"\");\n        }\n    }\n}\nif (cmd == \"GET_TAG_EXPNBR\"){\n        global.set(\"tag_ExpNbr\",l[1]);\n}\n\nmsg.payload = ret;//JSON.stringify(ret);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 160,
+        "wires": [
+            [
+                "5136fa8e1a90f6bf"
+            ]
+        ]
+    },
+    {
+        "id": "5136fa8e1a90f6bf",
+        "type": "debug",
+        "z": "c4b025abd5ce7129",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "891a9d656a984d68",
+        "type": "inject",
+        "z": "66e5565b0922bdd1",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 230,
+        "y": 160,
+        "wires": [
+            [
+                "40d247a1f131a9bb"
+            ]
+        ]
+    },
+    {
+        "id": "a4bf7f274a9fd543",
+        "type": "debug",
+        "z": "66e5565b0922bdd1",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "0d58186d31ee0cd3",
+        "type": "Kafka Producer",
+        "z": "66e5565b0922bdd1",
+        "name": "tag_UUID producer",
+        "broker": "eda1c410c837d7b0",
+        "topic": "tag_infos",
+        "topicSlash2dot": false,
+        "requireAcks": "1",
+        "ackTimeoutMs": 100,
+        "partitionerType": "0",
+        "key": "",
+        "partition": 0,
+        "attributes": 0,
+        "connectionType": "Producer",
+        "convertFromJson": false,
+        "x": 830,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "40d247a1f131a9bb",
+        "type": "function",
+        "z": "66e5565b0922bdd1",
+        "name": "",
+        "func": "let s = \"{\\\"tag\\\": {\\\"name\\\":\"+ \"\\\"\" + global.get(\"tag_Name\") + \"\\\"\" + ',' + \n            \"\\\"uid\\\":\" + \"\\\"\" + global.get(\"tag_UUID\") + \"\\\"\" + ',' + \n            \"\\\"datestart\\\":\" + \"\\\"\" + global.get(\"tag_DateStart\") + \"\\\"\" + ',' + \n            \"\\\"datestop\\\":\" + \"\\\"\" + global.get(\"tag_DateStop\") + \"\\\"\" + ',' + \n            \"\\\"ExpNbr\\\":\" + \"\\\"\" + global.get(\"tag_ExpNbr\") + \"\\\"\" +  \n            '},' + \n            \"\\\"reader\\\": {\" +\n            \"\\\"BLE_state\\\":\" +  \"\\\"\" + global.get(\"rfid_reader_BLE_state\") + \"\\\"\" + ',' + \n            \"\\\"status\\\":\" + \"\\\"\" + global.get(\"rfid_reader_status\") + \"\\\"\" + \n            \"}}\";\nmsg.payload = s;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 160,
+        "wires": [
+            [
+                "0d58186d31ee0cd3",
+                "a4bf7f274a9fd543"
+            ]
+        ]
+    }
+]

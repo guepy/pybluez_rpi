@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  ble_app:
+    build: ble_app_img
+    container_name: ble
+    network_mode: "host"
+    labels:
+      - org.bluez=":1.23"
+    volumes:
+      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket
+volumes:
+  /run/dbus/system_bus_socket
+  

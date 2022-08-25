@@ -1,0 +1,34 @@
+FROM alpine:latest AS base
+RUN set -x && \
+		apk update && \
+		apk add doas && \
+		apk add python3 && \
+		apk add py-pip && \
+		apk add dbus-libs musl glib && \
+		apk add py3-dbus && \
+		apk add py3-bluez && \
+		apk add iputils && \
+		apk add py3-gobject3 && \		
+		apk add d-feet && \
+		apk add sudo
+
+RUN apk add gobject-introspection-dev
+RUN apk add --upgrade gobject-introspection
+ENV USERNAME="eca"
+
+RUN passwd -d root
+RUN	adduser -D "$USERNAME" $USERNAME
+RUN echo "$USERNAME ALL=(ALL) ALL" > /etc/sudoers.d/$USERNAME && chmod 0440 /etc/sudoers.d/$USERNAME 
+RUN echo "eca:labeca" | chpasswd
+RUN apk add openrc
+RUN apk add bluez
+
+WORKDIR /home/$USERNAME
+USER $USERNAME
+RUN mkdir -p ./Documents/pyBLuez
+#RUN pip install pyGObject && cd ./Documents/pyBLuez
+COPY --chown=$USERNAME:$USERNAME ./pyBLuez/ ./Documents/pyBLuez/
+RUN chmod +x ./Documents/pyBLuez/entrypoint.sh
+#ENTRYPOINT ["./entrypoint.sh"]
+#CMD ["./rpi_main_server_RFID.py", "-t", "5"]
+CMD /bin/sh
