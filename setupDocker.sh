@@ -18,7 +18,7 @@
  sudo apt install  -y python3-pip 
  sudo apt install  -y python3-gi python3-gi-cairo gir1.2-gtk-3.0	
  sudo apt install  -y d-feet
- sudo apt install git 
+ sudo apt install git dbus
  pip install dbus-python
  pip install pybluez
  
@@ -48,7 +48,8 @@
  fi
  echo "[OK]"
  cd ..
- sudo sh -c "echo { \"insecure-registries\":[\"172.16.3.80:5000\"] } >> /etc/docker/daemon.json"
+ #This is for use of personnal docker registry
+ #sudo sh -c "echo { \"insecure-registries\":[\"172.16.3.80:5000\"] } >> /etc/docker/daemon.json"
  echo "export DOCKER_BUILDKIT=1" >> ~/.bashrc
  echo "export COMPOSE_DOCKER_CLI_BUILD=0" >> ~/.bashrc
  source ~/.bashrc
