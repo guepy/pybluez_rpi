@@ -23,9 +23,10 @@ RUN echo "$USERNAME ALL=(ALL) ALL" > /etc/sudoers.d/$USERNAME && chmod 0440 /etc
 RUN echo "eca:labeca" | chpasswd
 RUN apk add openrc
 RUN apk add bluez
-COPY ./bluetoothd /usr/lib/bluetooth/bluetoothd
+COPY ./bluetoothd /usr/lib/bluetooth/bluetoothd 
 WORKDIR /home/$USERNAME
 USER $USERNAME
+ENV BLE_MAC_ADDRESS="8C:AA:B5:80:19:D2"
 RUN export DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS
 RUN mkdir -p ./Documents/pyBLuez
 RUN pip install pyGObject && cd ./Documents/pyBLuez

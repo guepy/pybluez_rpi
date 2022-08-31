@@ -593,23 +593,6 @@ def List_dev_found():
 			
 		ctr += 1
 
-def Try_custom_ECCEL_cmds():
-	cmd = etp.CMD_LIST.CMD_GET_TAG_COUNT.value
-	arg = []
-	Send_ECCEL_cmd(cmd, arg)
-	cmd = etp.CMD_LIST.CMD_GET_UID.value
-	arg = [0]
-	Send_ECCEL_cmd(cmd, arg)
-	cmd = etp.CMD_LIST.CMD_MFDF_APP_IDSRROR.value
-	arg = [1]
-	Send_ECCEL_cmd(cmd, arg)
-	cmd = etp.CMD_LIST.CMD_MFDF_GET_FREEMEM.value
-	arg = []
-	Send_ECCEL_cmd(cmd, arg)
-	cmd = etp.CMD_LIST.CMD_MFU_READ_PAGE.value
-	arg = [1,2]
-	Send_ECCEL_cmd(cmd, arg)
-	
 def Connect_dev(dev_prop_dict):
 	global bus
 	global devices
@@ -769,13 +752,9 @@ if __name__ == '__main__':
 	tcp_evt = Event()
 	tcp_evt.clear()
 	signal.signal(signal.SIGINT, keyboardInterruptHandler)
-	#executor = cf.ThreadPoolExecutor(max_workers = 1)
-	
 	client = btcp.TCPChatClient(name, port, host = '172.17.0.1')
-	#tcp_client_thread = executor.submit(client.run)
 	tcp_client_thread = myThread(1, "tcp_client", 1)
 	tcp_client_thread.daemon = False
-	#tcp_client_thread.start()
 	
 	#dbus initialization steps
 	dmg.DBusGMainLoop(set_as_default = True)

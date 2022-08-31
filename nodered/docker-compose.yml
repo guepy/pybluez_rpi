@@ -2,7 +2,7 @@ version: '3'
 
 services:
   nodered_app:
-    build: guepydocker/rfid_rpi_nodered_img
+    image: guepydocker/rfid_rpi_nodered_img
     container_name: rpinodered
     network_mode: "host"
     volumes:

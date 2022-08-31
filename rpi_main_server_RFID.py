@@ -28,6 +28,8 @@ import select
 from binascii import hexlify
 import time
 import math
+import yaml
+from yaml import SafeLoader
 
 sys.path.insert(0,'.')
 # define the bluetooth controler
@@ -748,8 +750,8 @@ class TCPChatClient(object):
 			try:
 				sys.stdout.write(self.prompt)
 				sys.stdout.flush()
-				#wait for input from socket or stdin
-				readable, writable, exceptional = select.select([sys.stdin, TCP_sock], [], [])
+				#wait for input from socket
+				readable, writable, exceptional = select.select([TCP_sock], [], [])
 				for sock in readable:
 					if sock == TCP_sock:
 						data = receive(sock)
@@ -765,9 +767,6 @@ class TCPChatClient(object):
 							tcp_rx_queue.put(data)
 							tcp_rx_evt.set()
 							
-					elif sock == sys.stdin:
-						data = sys.stdin.readline().strip()
-						print("Keyboard pressed, value: {}".format(data))
 					else:
 						print("unknow file descriptor")
 			except KeyboardInterrupt:
@@ -1163,27 +1162,35 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description = 'First trial program')
 	parser.add_argument('-t','--timeout', action = "store", dest = "timeout", type = int, required = True)
 	'''
-	parser.add_argument('-n','--name', action = "store", dest = "name", required = True)
+	parser.add_argument('-a','--address', action = "store", dest = "address", required = True)
 	parser.add_argument('-p', '--port', action = "store", dest = "port", type = int, required = True)
 	'''
 	given_args = parser.parse_args()
 	port = TCP_PORT
 	name = "ECCEL_RFID_READER"
 	timeout = given_args.timeout
+	
+	print("Parsing bluetooth mac address from ble_devices.yaml")
+	with open("ble_devices.yaml") as fd:
+		data = yaml.load(fd, Loader = SafeLoader)
+	addr = None
+	if "dev_1" in data:
+		addr = data["dev_1"].replace('_',':')
+	if addr == None:
+		sys.exit(-1)
+	BTADDR_OF_INTEREST = addr
+	print("BLE_DEVICE_MAC_ADDRESS:{}".format(BTADDR_OF_INTEREST))
 	ECCEL_BLE_EVT = 0
 	TCP_connected = False
-	#bluetooth connexion ok?
 	ECCEL_connected = False
 	
 	scanTime = timeout* 1000
 	signal.signal(signal.SIGINT, keyboardInterruptHandler)
-	#executor = cf.ThreadPoolExecutor(max_workers = 1)
 	
-	client = TCPChatClient(name, port, host = '172.17.0.1')
+	client = TCPChatClient(name, port, host = TCP_HOSTNAME)
 	rfid_send_cmdd = RFID_send_cmdd()
 	processing_ble_msgs = Process_BLE_msgs()
 	
-	#tcp_client_thread = executor.submit(client.run)
 	tcp_client_thread = TCPConnexionThreads(1, "tcp_client")
 	rfid_send_cmdd_thread = myThread(2, "rfid_send_cmdd")
 	processing_ble_msgs_thread = myThread(3, "Process_BLE_msgs")
