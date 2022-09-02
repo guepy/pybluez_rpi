@@ -25,15 +25,12 @@
  fi
  echo "[OK]"
  sudo usermod -aG docker ${USER}
+echo "Clonning docker compose..."
+ git clone https://github.com/docker/compose.git
  echo "[OK]"
- if [ -d "./compose" ]
- then
  echo "Installing docker compose..."
  cd ./compose
  make
- else 
-	echo "Make sure docker compose is install on your host"
- fi
  echo "[OK]"
  cd ..
  #This is for use of personnal docker registry
