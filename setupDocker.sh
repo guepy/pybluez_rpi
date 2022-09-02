@@ -1,6 +1,13 @@
  #!/bin/sh
  set -x
  echo "start"
+ echo "creating folder rfid project..."
+ mkdir -p ~/rfidproject
+ echo "[OK]"
+ echo "cd to folder rfid project..."
+ cd ~/rfidproject
+ echo "[OK]"
+ 
  echo "Updating packages database..."
  sudo apt update 
  sudo apt upgrade -y
@@ -16,21 +23,29 @@
  pip install pybluez
  
  echo "[OK]"
+ echo "Downloading docker setup file..."
  if [ -f "./get-docker.sh" ]
  then 
+	echo "file already exist"
+ else
+	curl -fsSL https://get.docker.com -o get-docker.sh
+	chmod +x ./get-docker.sh
 	echo "Installing docker tools..."
 	sudo sh ./get-docker.sh
- else
-	echo "Make sure docker is install on your host"
  fi
  echo "[OK]"
  sudo usermod -aG docker ${USER}
-echo "Clonning docker compose..."
- git clone https://github.com/docker/compose.git
  echo "[OK]"
+ echo "Clonnig docker compose directory..."
+ if [ -d "./compose" ]
+ then
+	echo "Directory compose already exist"
+ else 
+	git clone https://github.com/docker/compose.git
  echo "Installing docker compose..."
  cd ./compose
  make
+ fi
  echo "[OK]"
  cd ..
  #This is for use of personnal docker registry
@@ -45,7 +60,9 @@ echo "Clonning docker compose..."
  then
 	rm -Rfa ./pyBluez
  fi
+ git clone https://github.com/guepy/pybluez_rpi.git pyBluez
  sudo chown -R ${USER}:${USER} .
+ cd pyBluez
  docker compose build
  docker compose up -d
  echo "[Finished]"
