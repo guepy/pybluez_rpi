@@ -3,6 +3,7 @@ from enum import Enum, unique
 OCTETS_PER_ICODE_BLOCK = 4
 KEY_A = 0
 KEY_1 = 0
+#The dict binds tag_type byte to its corresponding string
 TAG_TYPE ={
 1:'MIFARE Ultraligth',
 2:'MIFARE Ultraligth-C',
@@ -31,6 +32,7 @@ TAG_TYPE ={
 0x50:'BLE PIN'
 }
 
+#The table is given by ECCEL to check data integrity
 CCITTCRCTable = [
 0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5,
 0x60c6, 0x70e7, 0x8108, 0x9129, 0xa14a, 0xb16b,
@@ -76,12 +78,14 @@ CCITTCRCTable = [
 0x8fd9, 0x9ff8, 0x6e17, 0x7e36, 0x4e55, 0x5e74,
 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0 ]
 
+#A scoped enumeration which list all bluetoth settings
 @unique 
 class BLUETOOTH_SETTINGS(Enum):
 	DISABLED = 0
 	SPP = 1
 	BLE = 2
 	HID = 3
+#A scoped enumeration which include all RFID subcmds
 @unique 
 class SUBCMD_LIST(Enum):
 	SUBCMD_GENERAL_ID = 0x00
@@ -92,6 +96,8 @@ class SUBCMD_LIST(Enum):
 	SUBCMD_MQTT_ID = 0x05	
 	SUBCMD_RESTAPI_ID = 0x06
 	SUBCMD_WEBSOCKET_ID = 0x07
+	
+#A scoped enumeration which include all RFID cmds
 @unique 
 class CMD_LIST(Enum):
 	#General commands
@@ -203,6 +209,7 @@ class CMD_LIST(Enum):
 	CMD_ASYNC = 0xFE
 	CMD_ERROR = 0xFF
 	
+#A dict which associates cmd value to their corresponding name 
 RFID_CMD_NAME = {
 	CMD_LIST.CMD_GET_UID.value : "GET_TAG_INFOS",
 	CMD_LIST.CMD_ACTIVATE_TAG.value : "ACTIVATE_TAG",
@@ -216,6 +223,7 @@ RFID_CMD_NAME = {
 	CMD_LIST.CMD_ICODE_READ_BLOCK.value: "ICODE_READ_BLOCK",
 	CMD_LIST.CMD_ICODE_GET_SYSTEM_INFOS.value: "SYS_INFOS"
 }
+#A scoped enum which defines tag memory layout
 class TAG_MEMORY_LAYOUT(Enum):
 	TAG_NAME = 0x1
 	TAG_NAME_CNT = 0xA
@@ -227,7 +235,8 @@ class TAG_MEMORY_LAYOUT(Enum):
 	TAG_DATESTOP_CNT = 2
 	TAG_COMMENTS = 0x10
 	TAG_COMMENTS_CNT = 24
-	
+
+#A dict which match the memory layout to its corresponding string
 MEMORY_BLOCK_NAME = {
 	TAG_MEMORY_LAYOUT.TAG_NAME.value : "GET_TAG_NAME",
 	TAG_MEMORY_LAYOUT.TAG_DATESTART.value : "GET_TAG_DATESTART",
@@ -235,7 +244,7 @@ MEMORY_BLOCK_NAME = {
 	TAG_MEMORY_LAYOUT.TAG_EXPNBR.value : "GET_TAG_EXPNBR",
 	TAG_MEMORY_LAYOUT.TAG_COMMENTS.value : "GET_TAG_COMMENTS"
 }
-
+#The function calculates the CRC code corresponding to data
 def GetCCITTCRC(data):
 	if len(data) == 0:
 		return

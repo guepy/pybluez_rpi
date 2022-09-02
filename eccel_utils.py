@@ -17,6 +17,8 @@ tag_datestop_list = []
 tag_expnbr_list = []
 current_tag_UUID = ""
 readall = 0
+
+#The function formats cmd to be send to the RFID Reader
 def Format_ECCEL_cmd(cmd, arg):
 	global SET_POLLING
 	global block_name
@@ -72,14 +74,15 @@ def Format_ECCEL_cmd(cmd, arg):
 	to_send_str = ''.join(' {:02X}'.format(c) for c in to_send)
 	print('command send to ECCEL reader {}'.format(to_send_str))
 	return to_send
-
+	
+# THe function decodes data received from the RFID reader
 def Process_ECCEL_read_data(read_data):
 	global ret
 	global stop_reading
 	global dmc_received
 	global current_tag_UUID
 	global readall
-	#send_data template
+	#received data
 	#[STX byte(0xF5), cmd_len(2 bytes, LSB first),cmd_len XOR 0xFFFF(2 bytes), ASYNC Byte(0xFE), ECCEL_cmd(1byte), cmd_arg(n bytes),CRC code(2 bytes)]  
 	#cmd_len = ECCEL_cmd length + cmd_arg length + CRC_code length
 	# cmd_arg template for cmd = GET_UID_CMD
@@ -230,35 +233,5 @@ def Process_ECCEL_read_data(read_data):
 		ret["payload"] = sys_infos_str
 		return ret
 		
-		'''
-	if cmd == etp.CMD_LIST.CMD_MFU_READ_PAGE.value: 
-		tag_addr = read_data[7]
-		print("Read to TAG memory address {} succeed".format(tag_addr))
-	
-	if cmd == etp.CMD_LIST.CMD_MFU_WRITE_PAGE.value:  
-		tag_addr = read_data[7]
-		print("Write to TAG memory address {} succeed".format(tag_addr))
-	if cmd == etp.CMD_LIST.CMD_SET_POLLING.value:  
-		found = 1
-		print("Pooling state has been successfully updated")
-	if cmd == etp.CMD_LIST.CMD_MFDF_GET_FREEMEM.value:  
-		free_mem = read_data[7] + (read_data[8] << 8) + (read_data[9] << 16) + (read_data[10] << 24)
-		if free_mem > math.pow(2,30):
-			print("free memory on the activated tag is {} Go".format(free_mem/math.pow(2,30)))
-			return
-		if free_mem > math.pow(2,20):
-			print("free memory on the activated tag is {} Mo".format(free_mem/math.pow(2,20)))
-			return
-		if free_mem > math.pow(2,10):
-			print("free memory on the activated tag is {} Ko".format(free_mem/math.pow(2,10)))
-			return
-		print("free memory on the activated tag is {} octets".format(free_mem))
-	if cmd == etp.CMD_LIST.CMD_MFDF_APP_IDSRROR.value:  
-		app_id_nbr = cmd_len - 3
-		app_ids = read_data[7:-2] 
-		app_id_list = ''.join(' {:02X}'.format(i) for i in app_ids)
-		print("The read TAG contains an APP with ID {}".format(app_id_list))
-	'''
-
 	return
 	

@@ -52,8 +52,10 @@
  #sudo sh -c "echo { \"insecure-registries\":[\"172.16.3.80:5000\"] } >> /etc/docker/daemon.json"
  echo "export DOCKER_BUILDKIT=1" >> ~/.bashrc
  echo "export COMPOSE_DOCKER_CLI_BUILD=0" >> ~/.bashrc
+ python3 parse_mac_addr.py
  source ~/.bashrc
- 
+ #adresse du broker kafka
+ sudo sh -c "echo \"195.221.0.168 sun-si-pluss\" >> /etc/hosts"
  cd ~/rfidproject
  if [ -d "./pyBluez" ]
  then
@@ -61,11 +63,7 @@
  fi
  git clone https://github.com/guepy/pybluez_rpi.git pyBluez
  sudo chown -R ${USER}:${USER} .
- docker pull guepydocker/ble_app_img
- docker pull guepydocker/alpine_bluetooth_rpi
- cd ~/rfidproject/pyBluez/nodered
- docker compose up
- cd ~/rfidproject/pyBluez/ble_app 
- docker run -it --net=host --privileged --volume /run/dbus/system_bus_socket:/run/dbus/system_bus_socket --user $(id -u):$(id -g) --name ble  guepydocker/ble_app_img
- 
+ cd pyBluez
+ docker compose build
+ docker compose up -d
  echo "[Finished]"

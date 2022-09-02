@@ -101,9 +101,10 @@ SENSORTILE_quaternions_read_path = ''
 connexion_ok = False
 	
 #these service routines argument will be served by signal they are bound to as they
-#are follow the signal-slot mechanism
+#follow the signal-slot mechanism
 def Interfaces_added(path, interfaces):
-	#interface is an array of dictionnary
+	#interfaces is an array of dictionnary
+	#path is the interface path in the dbus field
 	global devices
 	global found_src
 	global found_chr
@@ -120,7 +121,7 @@ def Interfaces_added(path, interfaces):
 	global dev_chr_proxy_write_eccel
 	global dev_chr_interface_write_eccel
 	print("Interface added")
-
+#Check if the interface added is a device
 	if btc.DEVICE_INTERFACE in interfaces:
 		device_properties = interfaces[btc.DEVICE_INTERFACE]
 		if path not in devices:
@@ -146,6 +147,7 @@ def Interfaces_added(path, interfaces):
 				print("Device RSSI: {}".format(dev['RSSI']))
 			print("-----------------------------------------------------------")
 		
+#Check if the interface added is a service
 	if btc.GATT_SERVICE_INTERFACE in interfaces:
 		prop = interfaces[btc.GATT_SERVICE_INTERFACE]
 		print("Service Path: {}".format(path))
@@ -162,6 +164,7 @@ def Interfaces_added(path, interfaces):
 				src_path = path
 		print("-----------------------------------------------------------")
 		
+#Check if the interface added is a characteristic
 	if btc.GATT_CHARACTERISTIC_INTERFACE in interfaces:
 		prop = interfaces[btc.GATT_CHARACTERISTIC_INTERFACE]
 		print("Charractetitic Path: {}".format(path))
@@ -187,6 +190,7 @@ def Interfaces_added(path, interfaces):
 		print("Charractetitic Flags: {}".format(btu.dbus_to_python(flags)))	
 		print("-----------------------------------------------------------")
 		
+#Check if the interface added is a descriptor
 	if btc.GATT_DESCRIPTOR_INTERFACE in interfaces:
 		prop = interfaces[btc.GATT_DESCRIPTOR_INTERFACE]
 		msg["name"] = "DESC_ADDED"
@@ -203,12 +207,14 @@ def Interfaces_added(path, interfaces):
 		#Read_descriptor_value(path)	
 		
 	return
-
+	
+#Used to free send buffer
 def free_buf_after_send(msg):
 	msg["name"] = ""
 	msg["topic"] = ""
 	msg["payload"] = ""
 	
+#Subscribe to the characteritic path chr_path to be notified on update in this chararacteristic
 def Start_characteristic_notification(chr_path):
 	global bus
 	global ECCEL_read_path
@@ -234,6 +240,7 @@ def Start_characteristic_notification(chr_path):
 		print('successfully register to notifications on {}'.format(chr_path))
 		return btc.RESULT_OK
 
+#Used to read a received notification on a bluetoth adapter
 def Char_notification_received(interface, changed, not_used, path):
 	global bus
 	global ble_queue
@@ -248,7 +255,8 @@ def Char_notification_received(interface, changed, not_used, path):
 			ble_queue.put((ECCEL_BLE_EVT, text))
 		ble_evt.set()
 		return btc.RESULT_OK
-			
+
+#Used to read a value of a characteristic
 def Read_characteristic_value(chr_path):
 	global bus
 	dev_chr_proxy = bus.get_object(	btc.BLUEZ_SERVICE_NAME, chr_path)
@@ -265,6 +273,7 @@ def Read_characteristic_value(chr_path):
 		print('char: {} \n Value : {}'.format(chr_path, tmp))
 		return btc.RESULT_OK
 		
+#send a cmd to the rfid reader
 def Send_ECCEL_cmd(cmd, arg):
 	global ECCEL_send_cmd_path
 	'''
@@ -279,6 +288,7 @@ def Send_ECCEL_cmd(cmd, arg):
 	else:
 		print('unknow char path')
 	
+#Used to read the value of a descriptor
 def Read_descriptor_value(chr_path):
 	global bus
 	dev_chr_proxy = bus.get_object(	btc.BLUEZ_SERVICE_NAME, chr_path)
@@ -296,6 +306,7 @@ def Read_descriptor_value(chr_path):
 		return btc.RESULT_OK
 		
 	
+#Used to write a value to a characteristic
 def Write_characteristic_value(chr_path, value):
 	global dev_chr_interface_write_eccel
 	try:
@@ -312,7 +323,7 @@ def Write_characteristic_value(chr_path, value):
 		return btc.RESULT_OK
 			
 
-
+#Used to configure global dbus names as well starting the scan of nearby bluetooth devices
 def Discover_dev(timeout):
 	global adapter_interface
 	global adapter_path
@@ -343,6 +354,8 @@ def Discover_dev(timeout):
 		Remove_dev(dev_dict)
 	mainLoop.run()
 
+#callback called every timeout to list the nearby devices found
+#and ask the rfid reader(if connected) to activate the next tag it detects
 def Discovery_timeout():
 	global timer_id
 	global bus
@@ -353,12 +366,6 @@ def Discovery_timeout():
 	global tcp_rx_queue
 	global ECCEL_connected
 	
-	#GLib.source_remove(timer_id)
-	#mainLoop.quit()
-	#adapter_interface.StopDiscovery()
-	#bus.remove_signal_receiver(Interfaces_added, "InterfacesAdded")
-	#bus.remove_signal_receiver(Interfaces_removed, "InterfacesRemoved")
-	#bus.remove_signal_receiver(Properties_changed, "PropertiesChanged")
 	List_dev_found()
 	for path in path_list:
 		dev_dict = devices[path]
@@ -367,8 +374,6 @@ def Discovery_timeout():
 	Send_ECCEL_cmd(etp.CMD_LIST.CMD_ICODE_INVENTORY_NEXT.value,[])
 	print("\nreadall is %d"%ecu.readall)
 	if ecu.readall == 1:
-		#This is excuted every 1 min according to the reader settings
-		#Send_ECCEL_cmd(etp.CMD_LIST.CMD_ACTIVATE_TAG.value,[])
 		msg = {
 			"name":"ECCEL_READER",
 			"topic": "READ_ALL",
@@ -388,6 +393,7 @@ def Discovery_timeout():
 		print("RFID Reader bluetooth is not active")
 	return True
 
+#The callbak is called when an interface is removed to handle some stufs
 def Interfaces_removed(path, interfaces):
 	global devices
 	global ECCEL_connected
@@ -408,7 +414,7 @@ def Interfaces_removed(path, interfaces):
 		print("-----------------------------------------------------------")
 
 
-#Can be used to snife device position
+#The callback is executed when properties of the bluetooth adapter have changed 
 def Properties_changed(interface, changed, not_used, path):
 	global devices
 	global src_resolved_ok
@@ -443,12 +449,9 @@ def Properties_changed(interface, changed, not_used, path):
 			if path == ECCEL_READER_PATH:
 				if src_resolved_ok:					
 					Send_ECCEL_cmd(etp.CMD_LIST.CMD_ICODE_INVENTORY_START.value,[])
-					#Send_ECCEL_cmd(etp.CMD_LIST.CMD_GET_TAG_COUNT.value,[])
-					#Send_ECCEL_cmd(etp.CMD_LIST.CMD_GET_UID.value,[1])
-					#set_polling()
 					pass
 		
-
+#list the existing bluetooth devices
 def Get_known_dev():
 	global managed_objects_nbr
 	global bus
@@ -458,7 +461,6 @@ def Get_known_dev():
 	global object_manager
 	object_manager = dbus.Interface(bus.get_object(btc.BLUEZ_SERVICE_NAME, "/"), btc.DBUS_OM_IFACE)
 	managed_objects = object_manager.GetManagedObjects()
-	 
 	
 	print("---- Existing paths ---")
 	for path, ifaces in managed_objects.items():
@@ -472,7 +474,8 @@ def Get_known_dev():
 				if 'Address' in device_properties:
 					print('Address: {}'.format(device_properties['Address']))
 					print("-----------------------------------------------------")
-	
+					
+#List devices found by the bluetooth adapter after a scan is completed
 def List_dev_found():
 	global devices
 	print("**********************************************************************")		
@@ -490,18 +493,21 @@ def List_dev_found():
 				btu.dbus_to_python(dev['Address'])))
 			
 		ctr += 1
-
+		
+#used to activate pooling on RFID reader. The RFID reader will then scan every *pooling_time*
+#for new tag in the viccinity. If a tag is detected, its UID is read and send back to the application
 def set_polling():
 	print("Setting polling...")	
 	cmd = ecu.Format_ECCEL_cmd(etp.CMD_LIST.CMD_SET_POLLING.value, [1])
 	Write_characteristic_value(ECCEL_send_cmd_path, cmd)
 	
-
+#Deactivate pooling on the RFID reader 
 def reset_polling():
 	print("Resetting polling...")	
 	cmd = ecu.Format_ECCEL_cmd(etp.CMD_LIST.CMD_SET_POLLING.value, [0])
 	Write_characteristic_value(ECCEL_send_cmd_path, cmd)
-		
+
+#Used to reboot the RFID reader
 def reboot_BLE_rfid_reader():
 	print("Rebooting RFID_READER...")
 	msgs={
@@ -512,7 +518,8 @@ def reboot_BLE_rfid_reader():
 	tcp_tx_queue.put(msgs)
 	Send_ECCEL_cmd(etp.CMD_LIST.CMD_REBOOT.value,[])
 	Send_ECCEL_cmd(etp.CMD_LIST.CMD_PROTO_CONF.value, [etp.SUBCMD_LIST.SUBCMD_BLUETOOTH_ID.value ,etp.BLUETOOTH_SETTINGS.BLE.value])
-	
+
+#Used to connect local adapter to a remote bluetooth device
 def Connect_dev(dev_prop_dict):
 	global bus
 	global devices
@@ -572,6 +579,7 @@ def Connect_dev(dev_prop_dict):
 		print("WARNING!! Skiping connexion to {} as I think it is not a reliable device available".format(dev_prop_dict['Address']))
 		return
 
+#Used to disconnect the local adapter from a remote bluetooth device
 def Disconnect_dev(dev_add):
 	global bus
 	global devices
@@ -613,7 +621,7 @@ def Disconnect_dev(dev_add):
 		print("WARNING!! {} is unknow by the rpi".format(dev_add['Address']))
 		return
 
-
+#Used to remove a device in the list of known device
 def Remove_dev(dev_add):
 	global bus
 	global devices
@@ -655,13 +663,15 @@ def Remove_dev(dev_add):
 	else:
 		print("WARNING!! {} is unknow by the rpi".format(dev_add['Address']))
 		return
-			
+
+#Used to check if a remote bluetooth device is connected to the local adapter
 def Is_dev_connected(dev_proxy):
 	dev_prop = dbus.Interface(dev_proxy, btc.DBUS_PROPERTIES)
 	is_connected = dev_prop.Get(btc.DEVICE_INTERFACE, "Connected")
 	return is_connected
 
 #utilities
+#used to send tcp packets to nodered
 def send(channel, *args):
 	buf = cPickle.dumps(args)
 	value = socket.htonl(len(buf))
@@ -675,6 +685,7 @@ def send(channel, *args):
 		TCP_connected = False
 		
 	
+#function used to receive tcp packets from nodered
 def receive(channel):
 	
 	in_data_size = channel.recv(struct.calcsize("L"))
@@ -697,7 +708,8 @@ def receive(channel):
 	buf1 = cPickle.loads(buf)[0]
 	return buf1
 	
-	
+#A TCP client class which connects to the tcp server host by nodered and process
+# R/W requests
 class TCPChatClient(object):
 	"""A chat TCP client using select"""
 	def __init__(self, name, port, host = HOSTNAME):
@@ -796,7 +808,7 @@ class TCPChatClient(object):
 		TCP_sock.close()
 		TCP_connected = False
 						
-		
+#Callback executed when ctl+C signal is received by the app
 def keyboardInterruptHandler(signum,frame):
 	global client	
 	global mainLoop
@@ -810,6 +822,7 @@ def keyboardInterruptHandler(signum,frame):
 	#mainLoop.quit()
 	sys.exit(1)
 
+#A more general class to start  rfid_send_cmdd and processing_ble_msgs threads
 class myThread (threading.Thread):
 	
 	def __init__(self, threadID, name, counter=0):
@@ -828,7 +841,9 @@ class myThread (threading.Thread):
 		elif self.threadID == 3:
 			processing_ble_msgs.run()
 
-
+#The class make sure we never exit the TCPChatClient thread unless EXIT_APP is true.
+#It tries to reconnect TCPChatClient thread to the nodered TCP server whenever
+#TCP connexion is lost
 class TCPConnexionThreads (threading.Thread):
 	def __init__(self, threadID, name, counter=0):		   
 		threading.Thread.__init__(self)
@@ -848,7 +863,7 @@ class TCPConnexionThreads (threading.Thread):
 				client.run()
 		client.clear()
 
-
+#The class make sure we never exit the tcp_transmission_thread unless EXIT_APP is true.
 class TCPTransmissionThread (threading.Thread):
 	def __init__(self, threadID, name, counter=0):		   
 		threading.Thread.__init__(self)
@@ -866,7 +881,8 @@ class TCPTransmissionThread (threading.Thread):
 			else:
 				client.send_msg()
 		client.clear()
-
+		
+#The class send R/W requests from the tcp reception queue and send them to the RFID reader
 class RFID_send_cmdd(object):
 	def __init__(self):
 		print(" RFID_send_cmdd init")
@@ -968,6 +984,8 @@ class RFID_send_cmdd(object):
 					
 			
 		print ("Exiting RFID_send_cmdd, Thread %d" %(threading.get_ident() ))
+		
+#The function is intented to read sequentially all tag infos 
 def read_tag_all_infos():
 	read_tag_name()
 	read_tag_expnbr()
@@ -975,6 +993,8 @@ def read_tag_all_infos():
 	read_tag_datestop()
 	read_tag_comments()
 	
+#Used to read the tag experience number, it adds the result to the tcp transmission queue
+#so that it can be send later on to the nodered tcpserver
 def read_tag_expnbr():
 	icode_read_blocks(etp.TAG_MEMORY_LAYOUT.TAG_EXPNBR.value,etp.TAG_MEMORY_LAYOUT.TAG_EXPNBR_CNT.value)
 	Send_ECCEL_cmd(etp.CMD_LIST.CMD_DUMMY_COMMAND.value, [])
@@ -991,8 +1011,11 @@ def read_tag_expnbr():
 	msg["payload"] = nbr
 	tcp_tx_queue.put(msg)
 	
+#Used to read the tag comments, it adds the result to the tcp transmission queue
+#so that it can be send later on to the nodered tcpserver
 def read_tag_comments():
 	icode_read_blocks(etp.TAG_MEMORY_LAYOUT.TAG_COMMENTS.value,etp.TAG_MEMORY_LAYOUT.TAG_COMMENTS_CNT.value)
+	#To make sure response to the last cmd has already been received
 	Send_ECCEL_cmd(etp.CMD_LIST.CMD_DUMMY_COMMAND.value, [])
 	while ecu.dmc_received == 0:
 		pass
@@ -1009,6 +1032,8 @@ def read_tag_comments():
 	tcp_tx_queue.put(msg)
 
 
+#Used to read the tag name, it adds the result to the tcp transmission queue
+#so that it can be send later on to the nodered tcpserver
 def read_tag_name():
 	icode_read_blocks(etp.TAG_MEMORY_LAYOUT.TAG_NAME.value,etp.TAG_MEMORY_LAYOUT.TAG_NAME_CNT.value)
 	Send_ECCEL_cmd(etp.CMD_LIST.CMD_DUMMY_COMMAND.value, [])
@@ -1027,6 +1052,8 @@ def read_tag_name():
 	tcp_tx_queue.put(msg)
 	
 
+#Used to read the tag Datestart, it adds the result to the tcp transmission queue
+#so that it can be send later on to the nodered tcpserver
 def read_tag_datestart():
 	icode_read_blocks(etp.TAG_MEMORY_LAYOUT.TAG_DATESTART.value,etp.TAG_MEMORY_LAYOUT.TAG_DATESTART_CNT.value)
 	Send_ECCEL_cmd(etp.CMD_LIST.CMD_DUMMY_COMMAND.value, [])
@@ -1044,6 +1071,8 @@ def read_tag_datestart():
 	ecu.tag_datestart_list = []
 	tcp_tx_queue.put(msg)
 
+#Used to read the tag Datestop, it adds the result to the tcp transmission queue
+#so that it can be send later on to the nodered tcpserver
 def read_tag_datestop():
 	icode_read_blocks(etp.TAG_MEMORY_LAYOUT.TAG_DATESTOP.value,etp.TAG_MEMORY_LAYOUT.TAG_DATESTOP_CNT.value)
 	Send_ECCEL_cmd(etp.CMD_LIST.CMD_DUMMY_COMMAND.value, [])
@@ -1060,7 +1089,8 @@ def read_tag_datestop():
 		msg["payload"] = date_str + ' | ' + time_str
 	ecu.tag_datestop_list = []
 	tcp_tx_queue.put(msg)
-
+	
+#Read a serie of block in the tag memory
 def icode_read_blocks(start_block, block_count):
 	global colision_ctr
 	ecu.block_name = etp.MEMORY_BLOCK_NAME[start_block]
@@ -1085,6 +1115,7 @@ def icode_read_blocks(start_block, block_count):
 			
 	return 0
 
+#Write in a serie of block in the tag memory
 def icode_write_blocks(start_block, block_count, data):
 	if block_count == 0:
 		return
@@ -1120,6 +1151,7 @@ def icode_write_blocks(start_block, block_count, data):
 		Send_ECCEL_cmd(cmd, args)
 		current_block += 1	
 		
+#Process response to commands that has been sent to the RFID reader and add them to the TCP transmission queue
 class Process_BLE_msgs(object):
 	def __init__(self):
 		print(" Process BLE send msgs init")
@@ -1158,8 +1190,11 @@ class Process_BLE_msgs(object):
 			text =""
 		print ("Exiting Process BLE send msgs, Thread %d" %(threading.get_ident()  ))
 			
+#main function
 if __name__ == '__main__':	
+	
 	parser = argparse.ArgumentParser(description = 'First trial program')
+	#Scan time in s
 	parser.add_argument('-t','--timeout', action = "store", dest = "timeout", type = int, required = True)
 	'''
 	parser.add_argument('-a','--address', action = "store", dest = "address", required = True)
