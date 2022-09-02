@@ -1,0 +1,37 @@
+FROM alpine:latest AS base
+RUN set -x && \
+		apk update && \
+		apk add doas && \
+		apk add python3 && \
+		apk add py-pip && \
+		apk add dbus-libs musl glib && \
+		apk add py3-dbus && \
+		apk add py3-bluez && \
+		apk add iputils && \
+		apk add py3-gobject3 && \		
+		apk add d-feet && \
+		apk add sudo
+
+RUN apk add gobject-introspection-dev
+RUN apk add --upgrade gobject-introspection
+RUN apk add yaml
+ENV USERNAME="eca"
+ENV DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+RUN export DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS
+RUN passwd -d root
+RUN	adduser -D "$USERNAME" $USERNAME
+RUN echo "$USERNAME ALL=(ALL) ALL" > /etc/sudoers.d/$USERNAME && chmod 0440 /etc/sudoers.d/$USERNAME 
+RUN echo "eca:labeca" | chpasswd
+RUN apk add openrc
+RUN apk add bluez
+RUN apk add py3-yaml
+COPY ./bluetoothd /usr/lib/bluetooth/bluetoothd 
+WORKDIR /home/$USERNAME
+USER $USERNAME
+ENV BLE_MAC_ADDRESS="8C:AA:B5:80:19:D2"
+RUN export DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS
+RUN pip install pyGObject 
+RUN pip3 install pyyaml
+ENTRYPOINT ["/bin/sh"]
+#CMD ["./rpi_main_server_RFID.py", "-t", "5"]
+#CMD ["/bin/sh"]

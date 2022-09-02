@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  ble_app:
+    build: 
+      context: ./ble_app/
+      dockerfile: Dockerfile_bleapp_ufs
+    container_name: ble
+    network_mode: "host"
+    privileged: true
+    user: root
+    volumes:
+      - type: bind
+        source: /run/dbus/system_bus_socket
+        target: /run/dbus/system_bus_socket
+    depends_on: 
+      - "nodered_app"
+  nodered_app:
+    image: guepydocker/rfid_rpi_nodered_img
+    container_name: rpinodered
+    user: root
+    network_mode: "host"
+    volumes:
+      - vnodered:/data
+volumes:
+  vnodered:
+

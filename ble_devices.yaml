@@ -1,0 +1,7 @@
+#This YAML file contains list of bluetooth devices we are interested in
+#8C_AA_B5_80_19_D2 is used as default MAC address
+#to add a new bluetooth device change the MAC address of dev_1 with the one of the new device
+#make sure to replace ':' by '_'
+---
+dev_1: 8C_AA_B5_80_19_D2
+...
