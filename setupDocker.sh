@@ -9,8 +9,8 @@
  echo "[OK]"
  
  echo "Updating packages database..."
- sudo apt update 
- sudo apt upgrade -y
+ #sudo apt update 
+ #sudo apt upgrade -y
  echo "[OK]"
  echo "Downloading required packages..."
  sudo apt install  -y python3 
@@ -60,9 +60,13 @@
  then
 	rm -Rfa ./pyBluez
  fi
- git clone https://github.com/guepy/pybluez_rpi.git pyBluez
- sudo chown -R ${USER}:${USER} .
+ #git clone https://github.com/guepy/pybluez_rpi.git pyBluez
+ git clone https://gitlab.synchrotron-soleil.fr/eca/tests_gitlab/sensors/rfidproject.git pyBluez
  cd pyBluez
+ git pull https://gitlab.synchrotron-soleil.fr/eca/tests_gitlab/sensors/rfidproject.git develop
+
+ sudo chown -R ${USER}:${USER} .
+ #git checkout -b develop
  docker compose build
  docker compose up -d
  echo "[Finished]"

@@ -3,8 +3,8 @@ version: '3'
 services:
   ble_app:
     build: 
-      context: ./ble_app/
-      dockerfile: Dockerfile_bleapp_ufs
+      context: .
+      dockerfile: ./ble_app/Dockerfile_bleapp_ufs
     container_name: ble
     network_mode: "host"
     privileged: true

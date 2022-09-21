@@ -5,6 +5,6 @@ WORKDIR /home/$USERNAME
 RUN pip3 install pyyaml
 RUN mkdir -p ./Documents/pyBLuez
 WORKDIR /home/$USERNAME/Documents/pyBLuez
-COPY --chown=$USERNAME:$USERNAME ~/rfidproject/pyBLuez/ .
+COPY --chown=$USERNAME:$USERNAME ./ .
 RUN chmod +x ./entrypoint.sh
 ENTRYPOINT ["./entrypoint.sh"]
